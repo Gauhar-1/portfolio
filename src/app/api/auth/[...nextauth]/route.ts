@@ -1,26 +1,27 @@
 
 import NextAuth from 'next-auth';
-import GithubProvider from 'next-auth/providers/github';
+import CredentialsProvider from 'next-auth/providers/credentials';
 
 const handler = NextAuth({
   providers: [
-    GithubProvider({
-      clientId: process.env.GITHUB_ID as string,
-      clientSecret: process.env.GITHUB_SECRET as string,
-    }),
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: {  label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (credentials?.email === process.env.ADMIN_EMAIL && credentials?.password === process.env.ADMIN_PASSWORD) {
+          return { id: "1", name: "Admin", email: credentials.email };
+        }
+        return null;
+      }
+    })
   ],
   secret: process.env.NEXTAUTH_SECRET,
-  callbacks: {
-    async signIn({ user }) {
-      // For now, allow any signed-in user.
-      // In a real app, you'd likely want to restrict this to specific admin users.
-      // For example, by checking user.email against a whitelist.
-      if (user.email) {
-        return true;
-      }
-      return false;
-    },
-  },
+  pages: {
+    signIn: '/admin/login',
+  }
 });
 
 export { handler as GET, handler as POST };
