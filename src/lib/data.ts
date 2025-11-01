@@ -5,41 +5,6 @@ export const NAV_LINKS = [
     { href: '#contact', label: 'Contact' },
 ];
 
-export const SKILLS = {
-    'Languages & Frameworks': [
-        { name: 'JavaScript', icon: 'javascript' },
-        { name: 'TypeScript', icon: 'typescript' },
-        { name: 'React', icon: 'react' },
-        { name: 'Next.js', icon: 'nextjs' },
-        { name: 'Node.js', icon: 'nodejs' },
-        { name: 'Python', icon: 'python' },
-    ],
-    'Databases': [
-        { name: 'PostgreSQL', icon: 'postgresql' },
-        { name: 'MongoDB', icon: 'mongodb' },
-        { name: 'MySQL', icon: 'mysql' },
-        { name: 'Firebase', icon: 'firebase' },
-    ],
-    'Architecture & State': [
-        { name: 'Redux', icon: 'redux' },
-        { name: 'REST APIs', icon: 'api' },
-        { name: 'Microservices', icon: 'microservices' },
-        { name: 'GraphQL', icon: 'graphql' },
-    ],
-    'DevOps & Tools': [
-        { name: 'Docker', icon: 'docker' },
-        { name: 'Kubernetes', icon: 'kubernetes' },
-        { name: 'GitHub Actions', icon: 'githubactions' },
-        { name: 'Git', icon: 'git' },
-        { name: 'Nginx', icon: 'nginx' },
-    ],
-    'Security & Auth': [
-        { name: 'OAuth 2.0', icon: 'oauth' },
-        { name: 'JWT', icon: 'jwt' },
-        { name: 'NextAuth.js', icon: 'nextauth' },
-    ],
-};
-
 export const EXPERIENCE = [
     {
         title: 'Full Stack Developer',
