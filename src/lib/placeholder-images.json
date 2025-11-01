@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "project-screenshot-1",
+      "description": "Screenshot of the LAN communication app's main interface.",
+      "imageUrl": "https://images.unsplash.com/photo-1658953229625-aad99d7603b4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhcHAlMjBpbnRlcmZhY2V8ZW58MHx8fHwxNzYxOTA5OTgxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "app interface"
+    },
+    {
+      "id": "project-screenshot-2",
+      "description": "Screenshot of the file sharing feature in action.",
+      "imageUrl": "https://images.unsplash.com/photo-1759984782112-eab6e2c0384f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxmaWxlJTIwdHJhbnNmZXJ8ZW58MHx8fHwxNzYyMDA3MTA3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "file transfer"
+    },
+    {
+      "id": "project-screenshot-3",
+      "description": "Screenshot of the chat functionality.",
+      "imageUrl": "https://images.unsplash.com/photo-1684132925971-31c258718bd1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjaGF0JTIwYXBwbGljYXRpb258ZW58MHx8fHwxNzYxOTE3NTY0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "chat application"
+    },
+    {
+      "id": "project-demo-thumb",
+      "description": "Video demo thumbnail for the LAN communication app.",
+      "imageUrl": "https://images.unsplash.com/photo-1597007519573-0575fd4cc96b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxuZXR3b3JrJTIwY29kZXxlbnwwfHx8fDE3NjE5ODYzNTZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "network code"
+    }
+  ]
 }
