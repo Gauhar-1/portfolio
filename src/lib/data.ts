@@ -5,29 +5,6 @@ export const NAV_LINKS = [
     { href: '#contact', label: 'Contact' },
 ];
 
-export const EXPERIENCE = [
-    {
-        title: 'Full Stack Developer',
-        company: 'CodeClause (Internship)',
-        date: 'June 2024 - July 2024',
-        description: 'Developed and maintained web applications using React, Node.js, and MongoDB. Contributed to the development of a RESTful API and implemented responsive UI designs.',
-        technologies: ['React', 'Node.js', 'Express', 'MongoDB', 'JWT'],
-        links: {
-            website: 'https://codeclause.com',
-        },
-    },
-    {
-        title: 'Full Stack Development Trainee',
-        company: 'Newton School',
-        date: 'Oct 2023 - Present',
-        description: 'Completed a comprehensive full-stack development program, gaining expertise in MERN stack, data structures, and algorithms. Built several full-stack projects from scratch.',
-        technologies: ['React', 'Redux', 'Node.js', 'MongoDB', 'Data Structures', 'Algorithms'],
-        links: {
-            website: 'https://www.newtonschool.co/',
-        },
-    },
-];
-
 export const PROJECTS = [
     {
         id: 'lan-communicator',

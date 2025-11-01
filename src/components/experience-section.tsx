@@ -1,9 +1,46 @@
-import { EXPERIENCE } from '@/lib/data';
+'use client';
+
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Briefcase, ExternalLink, Github } from 'lucide-react';
+import { ExternalLink, Github, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+type Experience = {
+  _id: string;
+  title: string;
+  company: string;
+  date: string;
+  description: string;
+  technologies: string[];
+  links?: {
+    website?: string;
+    github?: string;
+  };
+};
 
 const ExperienceSection = () => {
+  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchExperiences = async () => {
+      try {
+        setIsLoading(true);
+        const res = await fetch('/api/experience');
+        if (!res.ok) {
+          throw new Error('Failed to fetch experiences');
+        }
+        const data: Experience[] = await res.json();
+        setExperiences(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchExperiences();
+  }, []);
+
   return (
     <section id="experience" className="py-24 sm:py-32">
       <div className="container mx-auto px-4">
@@ -12,12 +49,17 @@ const ExperienceSection = () => {
           <p className="mt-4 text-lg text-muted-foreground">My professional journey and projects.</p>
         </div>
 
+        {isLoading ? (
+            <div className="flex justify-center">
+                <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+        ) : (
         <div className="relative">
           {/* Timeline Line */}
           <div className="absolute left-6 md:left-1/2 -ml-px w-0.5 h-full bg-border" aria-hidden="true"></div>
 
-          {EXPERIENCE.map((item, index) => (
-            <div key={index} className="relative flex items-start group mb-12 animate-slide-in-from-bottom opacity-0 fill-mode-forwards" style={{ animationDelay: `${index * 0.2}s` }}>
+          {experiences.map((item, index) => (
+            <div key={item._id} className="relative flex items-start group mb-12 animate-slide-in-from-bottom opacity-0 fill-mode-forwards" style={{ animationDelay: `${index * 0.2}s` }}>
               {/* Timeline Dot */}
               <div className="absolute left-6 md:left-1/2 -ml-2.5 w-5 h-5 bg-background border-2 border-primary rounded-full z-10 transition-transform duration-300 group-hover:scale-125"></div>
               
@@ -42,12 +84,12 @@ const ExperienceSection = () => {
                         ))}
                       </div>
                       <div className="flex items-center gap-4">
-                        {item.links.website && (
+                        {item.links?.website && (
                           <a href={item.links.website} target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
                             <ExternalLink className="mr-1.5 h-4 w-4" /> Website
                           </a>
                         )}
-                        {item.links.github && (
+                        {item.links?.github && (
                           <a href={item.links.github} target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
                             <Github className="mr-1.5 h-4 w-4" /> GitHub
                           </a>
@@ -60,6 +102,7 @@ const ExperienceSection = () => {
             </div>
           ))}
         </div>
+        )}
       </div>
     </section>
   );
