@@ -5,7 +5,6 @@ import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { usePathname } from 'next/navigation';
-import { SessionProvider } from 'next-auth/react';
 
 export default function RootLayout({
   children,
@@ -24,12 +23,10 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased bg-background text-foreground">
-        <SessionProvider>
-          {!isAdminPage && <Header />}
-          <main>{children}</main>
-          {!isAdminPage && <Footer />}
-          <Toaster />
-        </SessionProvider>
+        {!isAdminPage && <Header />}
+        <main>{children}</main>
+        {!isAdminPage && <Footer />}
+        <Toaster />
       </body>
     </html>
   );
