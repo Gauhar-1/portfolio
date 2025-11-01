@@ -21,7 +21,9 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">Add, edit, or remove skills from your portfolio.</p>
-              <Button disabled>Coming Soon</Button>
+              <Button asChild>
+                <Link href="/admin/skills">Manage Skills</Link>
+              </Button>
             </CardContent>
           </Card>
 
@@ -31,7 +33,9 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">Update your work experience and professional journey.</p>
-              <Button disabled>Coming Soon</Button>
+              <Button asChild>
+                <Link href="/admin/experience">Manage Experience</Link>
+              </Button>
             </CardContent>
           </Card>
 
@@ -41,7 +45,9 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">Showcase your latest projects and creations.</p>
-              <Button disabled>Coming Soon</Button>
+              <Button asChild>
+                <Link href="/admin/projects">Manage Projects</Link>
+              </Button>
             </CardContent>
           </Card>
           
@@ -51,7 +57,9 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">Update your social and resume links.</p>
-              <Button disabled>Coming Soon</Button>
+               <Button asChild>
+                <Link href="/admin/links">Manage Links</Link>
+              </Button>
             </CardContent>
           </Card>
         </div>
