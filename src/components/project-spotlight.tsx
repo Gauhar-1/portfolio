@@ -27,7 +27,7 @@ const ProjectSpotlight = () => {
           {PROJECTS.map((project, index) => (
             <Card 
               key={index} 
-              className="flex flex-col transform transition-transform duration-300 hover:-translate-y-2 animate-slide-in-from-bottom opacity-0 fill-mode-forwards"
+              className="flex flex-col transform transition-all duration-300 hover:-translate-y-2 animate-slide-in-from-bottom opacity-0 fill-mode-forwards shadow-md hover:shadow-xl hover:shadow-primary/20"
               style={{ animationDelay: `${index * 0.2}s` }}
             >
               <CardHeader>
