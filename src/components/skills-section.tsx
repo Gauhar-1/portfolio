@@ -16,7 +16,7 @@ const SkillsSection = () => {
           {Object.entries(SKILLS).map(([category, skills], index) => (
             <Card 
               key={category} 
-              className="border-border/60 hover:border-primary/50 transition-colors duration-300 animate-slide-in-from-bottom opacity-0 fill-mode-forwards"
+              className="border-border/60 hover:border-primary/50 transition-all duration-300 animate-slide-in-from-bottom opacity-0 fill-mode-forwards shadow-md hover:shadow-xl hover:-translate-y-1"
               style={{ animationDelay: `${index * 0.15}s` }}
             >
               <CardHeader>
