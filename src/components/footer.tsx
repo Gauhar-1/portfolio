@@ -8,7 +8,7 @@ const Footer = () => {
     <footer className="border-t border-border/40">
       <div className="container mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between">
         <p className="text-sm text-muted-foreground mb-4 sm:mb-0">
-          &copy; {currentYear} Manish Das. All Rights Reserved.
+          &copy; {currentYear} MD Gohar Khan. All Rights Reserved.
         </p>
         <div className="flex items-center space-x-2">
           <a href="https://github.com/manish-das-22" target="_blank" rel="noopener noreferrer">

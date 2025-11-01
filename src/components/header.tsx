@@ -32,7 +32,7 @@ const Header = () => {
 
         <div className="flex flex-1 items-center justify-end space-x-2">
           <Button variant="outline" size="sm" asChild>
-            <a href="/Manish-Das-Resume.pdf" target="_blank" rel="noopener noreferrer">
+            <a href="/MD-Gohar-Khan-Resume.pdf" target="_blank" rel="noopener noreferrer">
               <Download className="mr-2 h-4 w-4" />
               Resume
             </a>
