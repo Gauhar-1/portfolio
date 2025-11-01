@@ -1,7 +1,6 @@
 import { SKILLS } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TechIcon } from '@/components/icons';
-import { Badge } from '@/components/ui/badge';
 
 const SkillsSection = () => {
   return (
@@ -14,8 +13,12 @@ const SkillsSection = () => {
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {Object.entries(SKILLS).map(([category, skills]) => (
-            <Card key={category} className="border-border/60 hover:border-primary/50 transition-colors duration-300">
+          {Object.entries(SKILLS).map(([category, skills], index) => (
+            <Card 
+              key={category} 
+              className="border-border/60 hover:border-primary/50 transition-colors duration-300 animate-slide-in-from-bottom opacity-0 fill-mode-forwards"
+              style={{ animationDelay: `${index * 0.15}s` }}
+            >
               <CardHeader>
                 <CardTitle className="text-2xl text-primary">{category}</CardTitle>
               </CardHeader>

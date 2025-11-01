@@ -17,9 +17,9 @@ const ExperienceSection = () => {
           <div className="absolute left-6 md:left-1/2 -ml-px w-0.5 h-full bg-border" aria-hidden="true"></div>
 
           {EXPERIENCE.map((item, index) => (
-            <div key={index} className="relative flex items-start group mb-12">
+            <div key={index} className="relative flex items-start group mb-12 animate-slide-in-from-bottom opacity-0 fill-mode-forwards" style={{ animationDelay: `${index * 0.2}s` }}>
               {/* Timeline Dot */}
-              <div className="absolute left-6 md:left-1/2 -ml-2.5 w-5 h-5 bg-background border-2 border-primary rounded-full z-10"></div>
+              <div className="absolute left-6 md:left-1/2 -ml-2.5 w-5 h-5 bg-background border-2 border-primary rounded-full z-10 transition-transform duration-300 group-hover:scale-125"></div>
               
               <div className={`w-full flex ${index % 2 === 0 ? 'md:flex-row-reverse' : 'md:flex-row'} items-center`}>
                 <div className="md:w-1/2 flex-shrink-0">
@@ -31,7 +31,7 @@ const ExperienceSection = () => {
                 </div>
 
                 <div className="md:w-1/2 w-full ml-12 md:ml-0">
-                  <Card className="w-full transform transition-transform duration-300 md:group-hover:scale-105">
+                  <Card className="w-full transform transition-all duration-300 md:group-hover:scale-105 md:group-hover:shadow-2xl md:group-hover:shadow-primary/20">
                     <CardHeader>
                       <CardDescription>{item.description}</CardDescription>
                     </CardHeader>
