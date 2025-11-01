@@ -32,7 +32,6 @@ const ProjectSpotlight = () => {
             >
               <CardHeader>
                 <CardTitle className="text-primary">{project.title}</CardTitle>
-                <CardDescription>{project.description}</CardDescription>
               </CardHeader>
               <CardContent className="flex-grow space-y-6">
                 {project.id === 'lan-communicator' ? (
@@ -65,18 +64,11 @@ const ProjectSpotlight = () => {
                     />
                   </div>
                 ) : null}
-
-                {project.features && (
-                  <div>
-                    <h4 className="font-semibold mb-2">Key Features:</h4>
-                    <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                      {project.features.map((feature, i) => <li key={i}>{feature}</li>)}
-                    </ul>
-                  </div>
-                )}
+                
+                <p className="text-muted-foreground">{project.description}</p>
                 
                 <div>
-                  <h4 className="font-semibold mb-2">Technologies:</h4>
+                  <h4 className="font-semibold mb-3">Technologies:</h4>
                   <div className="flex flex-wrap gap-2">
                     {project.technologies.map(tech => <Badge key={tech} variant="default">{tech}</Badge>)}
                   </div>
