@@ -1,0 +1,23 @@
+import mongoose, { Schema, Document, models, Model } from 'mongoose';
+
+export interface ILinks extends Document {
+  github: string;
+  linkedin: string;
+  resumeUrl: string;
+}
+
+const LinksSchema: Schema<ILinks> = new Schema({
+  github: {
+    type: String,
+  },
+  linkedin: {
+    type: String,
+  },
+  resumeUrl: {
+    type: String,
+  },
+});
+
+const Links: Model<ILinks> = models.Links || mongoose.model<ILinks>('Links', LinksSchema);
+
+export default Links;

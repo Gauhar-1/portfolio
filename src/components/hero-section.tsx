@@ -1,8 +1,35 @@
+'use client';
+
 import Link from 'next/link';
 import { Button } from './ui/button';
-import { Github, Linkedin, ArrowRight } from 'lucide-react';
+import { Github, Linkedin, ArrowRight, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+type Links = {
+  github?: string;
+  linkedin?: string;
+};
 
 const HeroSection = () => {
+  const [links, setLinks] = useState<Links>({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLinks = async () => {
+      try {
+        setIsLoading(true);
+        const res = await fetch('/api/links');
+        const data = await res.json();
+        setLinks(data || {});
+      } catch (error) {
+        console.error("Failed to fetch links", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchLinks();
+  }, []);
+
   return (
     <section id="home" className="py-24 sm:py-32 md:py-40 animate-fade-in">
       <div className="container mx-auto px-4 text-center">
@@ -24,14 +51,18 @@ const HeroSection = () => {
           </Button>
         </div>
         <div className="mt-12 flex items-center justify-center gap-x-6 animate-fade-in [animation-delay:0.8s] opacity-0 fill-mode-forwards">
-            <a href="https://github.com/Gauhar-1/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                <Github className="h-7 w-7" />
-                <span className="sr-only">GitHub</span>
-            </a>
-            <a href="https://www.linkedin.com/in/md-gohar-khan-bb9275321/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                <Linkedin className="h-7 w-7" />
-                <span className="sr-only">LinkedIn</span>
-            </a>
+            {isLoading ? <Loader2 className="h-7 w-7 animate-spin" /> : (
+              <>
+                <a href={links.github || '#'} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                    <Github className="h-7 w-7" />
+                    <span className="sr-only">GitHub</span>
+                </a>
+                <a href={links.linkedin || '#'} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                    <Linkedin className="h-7 w-7" />
+                    <span className="sr-only">LinkedIn</span>
+                </a>
+              </>
+            )}
         </div>
       </div>
     </section>

@@ -1,14 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Github, Linkedin, Download } from 'lucide-react';
+import { Menu, X, Github, Linkedin, Download, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { NAV_LINKS } from '@/lib/data';
 
+type Links = {
+  github?: string;
+  linkedin?: string;
+  resumeUrl?: string;
+};
+
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [links, setLinks] = useState<Links>({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLinks = async () => {
+      try {
+        setIsLoading(true);
+        const res = await fetch('/api/links');
+        const data = await res.json();
+        setLinks(data || {});
+      } catch (error) {
+        console.error("Failed to fetch links", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchLinks();
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -31,26 +55,32 @@ const Header = () => {
         </div>
 
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <Button variant="outline" size="sm" asChild>
-            <a href="/MD-Gohar-Khan-Resume.pdf" target="_blank" rel="noopener noreferrer">
-              <Download className="mr-2 h-4 w-4" />
-              Resume
-            </a>
-          </Button>
-          <div className="hidden md:flex items-center space-x-2">
-            <a href="https://github.com/Gauhar-1/" target="_blank" rel="noopener noreferrer">
-              <Button variant="ghost" size="icon">
-                <Github className="h-5 w-5" />
-                <span className="sr-only">GitHub</span>
+          {isLoading ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <>
+              <Button variant="outline" size="sm" asChild>
+                <a href={links.resumeUrl || '/MD-Gohar-Khan-Resume.pdf'} target="_blank" rel="noopener noreferrer">
+                  <Download className="mr-2 h-4 w-4" />
+                  Resume
+                </a>
               </Button>
-            </a>
-            <a href="https://www.linkedin.com/in/md-gohar-khan-bb9275321/" target="_blank" rel="noopener noreferrer">
-              <Button variant="ghost" size="icon">
-                <Linkedin className="h-5 w-5" />
-                <span className="sr-only">LinkedIn</span>
-              </Button>
-            </a>
-          </div>
+              <div className="hidden md:flex items-center space-x-2">
+                <a href={links.github || '#'} target="_blank" rel="noopener noreferrer">
+                  <Button variant="ghost" size="icon">
+                    <Github className="h-5 w-5" />
+                    <span className="sr-only">GitHub</span>
+                  </Button>
+                </a>
+                <a href={links.linkedin || '#'} target="_blank" rel="noopener noreferrer">
+                  <Button variant="ghost" size="icon">
+                    <Linkedin className="h-5 w-5" />
+                    <span className="sr-only">LinkedIn</span>
+                  </Button>
+                </a>
+              </div>
+            </>
+          )}
         </div>
 
         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -78,18 +108,22 @@ const Header = () => {
                 ))}
                 </nav>
                 <div className="mt-auto flex items-center gap-4">
-                    <a href="https://github.com/Gauhar-1/" target="_blank" rel="noopener noreferrer">
-                        <Button variant="outline" size="icon">
-                            <Github className="h-5 w-5" />
-                            <span className="sr-only">GitHub</span>
-                        </Button>
-                    </a>
-                    <a href="https://www.linkedin.com/in/md-gohar-khan-bb9275321/" target="_blank" rel="noopener noreferrer">
-                        <Button variant="outline" size="icon">
-                            <Linkedin className="h-5 w-5" />
-                            <span className="sr-only">LinkedIn</span>
-                        </Button>
-                    </a>
+                  {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : (
+                    <>
+                      <a href={links.github || '#'} target="_blank" rel="noopener noreferrer">
+                          <Button variant="outline" size="icon">
+                              <Github className="h-5 w-5" />
+                              <span className="sr-only">GitHub</span>
+                          </Button>
+                      </a>
+                      <a href={links.linkedin || '#'} target="_blank" rel="noopener noreferrer">
+                          <Button variant="outline" size="icon">
+                              <Linkedin className="h-5 w-5" />
+                              <span className="sr-only">LinkedIn</span>
+                          </Button>
+                      </a>
+                    </>
+                  )}
                 </div>
             </div>
           </SheetContent>
