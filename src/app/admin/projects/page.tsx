@@ -203,13 +203,13 @@ export default function ManageProjectsPage() {
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-h-[80vh] overflow-y-auto pr-2">
-                <FormField control={form.control} name="title" render={({ field }) => ( <FormItem> <FormLabel>Title</FormLabel> <FormControl> <Input placeholder="e.g. Awesome Project" {...field} /> </FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="description" render={({ field }) => ( <FormItem> <FormLabel>Description</FormLabel> <FormControl> <Textarea placeholder="Describe your project..." {...field} /> </FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="technologies" render={({ field }) => ( <FormItem> <FormLabel>Technologies (comma-separated)</FormLabel> <FormControl> <Input placeholder="e.g. React, Node.js, MongoDB" {...field} /> </FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="imageUrl" render={({ field }) => ( <FormItem> <FormLabel>Image URL</FormLabel> <FormControl> <Input placeholder="https://example.com/image.png" {...field} /> </FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="links.website" render={({ field }) => ( <FormItem> <FormLabel>Website URL</FormLabel> <FormControl> <Input placeholder="https://example.com" {...field} /> </FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="links.github" render={({ field }) => ( <FormItem> <FormLabel>GitHub URL</FormLabel> <FormControl> <Input placeholder="https://github.com/user/repo" {...field} /> </FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="links.demo" render={({ field }) => ( <FormItem> <FormLabel>Demo URL</FormLabel> <FormControl> <Input placeholder="https://youtube.com/watch?v=..." {...field} /> </FormControl> <FormMessage /> </FormItem> )} />
+                <FormField control={form.control} name="title" render={({ field }) => ( <FormItem> <FormLabel>Title</FormLabel> <FormControl> <Input placeholder="e.g. Awesome Project" {...field} /> </FormControl>  </FormItem> )} />
+                <FormField control={form.control} name="description" render={({ field }) => ( <FormItem> <FormLabel>Description</FormLabel> <FormControl> <Textarea placeholder="Describe your project..." {...field} /> </FormControl>  </FormItem> )} />
+                <FormField control={form.control} name="technologies" render={({ field }) => ( <FormItem> <FormLabel>Technologies (comma-separated)</FormLabel> <FormControl> <Input placeholder="e.g. React, Node.js, MongoDB" {...field} /> </FormControl>  </FormItem> )} />
+                <FormField control={form.control} name="imageUrl" render={({ field }) => ( <FormItem> <FormLabel>Image URL</FormLabel> <FormControl> <Input placeholder="https://example.com/image.png" {...field} /> </FormControl>  </FormItem> )} />
+                <FormField control={form.control} name="links.website" render={({ field }) => ( <FormItem> <FormLabel>Website URL</FormLabel> <FormControl> <Input placeholder="https://example.com" {...field} /> </FormControl>  </FormItem> )} />
+                <FormField control={form.control} name="links.github" render={({ field }) => ( <FormItem> <FormLabel>GitHub URL</FormLabel> <FormControl> <Input placeholder="https://github.com/user/repo" {...field} /> </FormControl>  </FormItem> )} />
+                <FormField control={form.control} name="links.demo" render={({ field }) => ( <FormItem> <FormLabel>Demo URL</FormLabel> <FormControl> <Input placeholder="https://youtube.com/watch?v=..." {...field} /> </FormControl>  </FormItem> )} />
                 
                 <Button type="submit" disabled={isSubmitting} className="mt-4">
                   {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</> : 'Save Project'}
