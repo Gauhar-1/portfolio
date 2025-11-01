@@ -76,7 +76,7 @@ export const PROJECTS = [
         ],
         technologies: ['Python', 'Socket Programming', 'Threading', 'Tkinter (for GUI version)'],
         links: {
-            github: 'https://github.com/manish-das-22/lan-based-communication-and-file-sharing-system',
+            github: 'https://github.com/Gauhar-1/lan-based-communication-and-file-sharing-system',
             demo: '#'
         },
     },
@@ -86,7 +86,7 @@ export const PROJECTS = [
         description: 'Designed and developed a complete travel booking platform with features like user authentication, hotel listings, booking management, and payment integration.',
         technologies: ['Next.js', 'Tailwind CSS', 'Prisma', 'PostgreSQL', 'Stripe'],
         links: {
-            github: 'https://github.com/manish-das-22/booking-app',
+            github: 'https://github.com/Gauhar-1/booking-app',
         },
         imageUrl: "https://picsum.photos/seed/booking/1280/720"
     }

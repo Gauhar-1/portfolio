@@ -24,11 +24,11 @@ const HeroSection = () => {
           </Button>
         </div>
         <div className="mt-12 flex items-center justify-center gap-x-6 animate-fade-in [animation-delay:0.8s] opacity-0 fill-mode-forwards">
-            <a href="https://github.com/manish-das-22" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+            <a href="https://github.com/Gauhar-1/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                 <Github className="h-7 w-7" />
                 <span className="sr-only">GitHub</span>
             </a>
-            <a href="https://linkedin.com/in/manish-das-02" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+            <a href="https://www.linkedin.com/in/md-gohar-khan-bb9275321/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                 <Linkedin className="h-7 w-7" />
                 <span className="sr-only">LinkedIn</span>
             </a>

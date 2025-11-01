@@ -11,13 +11,13 @@ const Footer = () => {
           &copy; {currentYear} MD Gohar Khan. All Rights Reserved.
         </p>
         <div className="flex items-center space-x-2">
-          <a href="https://github.com/manish-das-22" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/Gauhar-1/" target="_blank" rel="noopener noreferrer">
             <Button variant="ghost" size="icon">
               <Github className="h-5 w-5" />
               <span className="sr-only">GitHub</span>
             </Button>
           </a>
-          <a href="https://linkedin.com/in/manish-das-02" target="_blank" rel="noopener noreferrer">
+          <a href="https://www.linkedin.com/in/md-gohar-khan-bb9275321/" target="_blank" rel="noopener noreferrer">
             <Button variant="ghost" size="icon">
               <Linkedin className="h-5 w-5" />
               <span className="sr-only">LinkedIn</span>
