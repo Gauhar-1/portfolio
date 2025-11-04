@@ -1,6 +1,8 @@
 'use server';
 
 import * as z from 'zod';
+import dbConnect from '@/lib/mongodb';
+import Message from '@/models/Message';
 
 const formSchema = z.object({
   name: z.string().min(2),
@@ -8,26 +10,19 @@ const formSchema = z.object({
   message: z.string().min(10),
 });
 
-export async function sendEmail(formData: z.infer<typeof formSchema>) {
+export async function submitContactForm(formData: z.infer<typeof formSchema>) {
   const validatedFields = formSchema.safeParse(formData);
 
   if (!validatedFields.success) {
     return { success: false, error: 'Invalid fields.' };
   }
 
-  const { name, email, message } = validatedFields.data;
-
-  // In a real application, you would use an email service like Resend, Nodemailer, or SendGrid.
-  // For this example, we'll just log the data to the console.
-  console.log('--- New Message ---');
-  console.log('Name:', name);
-  console.log('Email:', email);
-  console.log('Message:', message);
-  console.log('Recipient: mdg_ug-22@mech.nits.ac.in');
-  console.log('-------------------');
-  
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  return { success: true };
+  try {
+    await dbConnect();
+    await Message.create(validatedFields.data);
+    return { success: true };
+  } catch (error) {
+    console.error('Error saving message:', error);
+    return { success: false, error: 'Failed to save message.' };
+  }
 }

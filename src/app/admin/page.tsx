@@ -62,6 +62,18 @@ export default function AdminPage() {
               </Button>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>View Messages</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">See messages submitted through your contact form.</p>
+               <Button asChild>
+                <Link href="/admin/messages">View Messages</Link>
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

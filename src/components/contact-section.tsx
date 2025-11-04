@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { sendEmail } from '@/app/actions';
+import { submitContactForm } from '@/app/actions';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -48,7 +48,7 @@ const ContactSection = () => {
 
   async function onSubmit(values: FormData) {
     setIsSubmitting(true);
-    const result = await sendEmail(values);
+    const result = await submitContactForm(values);
 
     if (result.success) {
       toast({
@@ -60,7 +60,7 @@ const ContactSection = () => {
       toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem with your request. Please try again.',
+        description: result.error || 'There was a problem with your request. Please try again.',
       });
     }
     setIsSubmitting(false);
