@@ -17,6 +17,18 @@ export default function AdminPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card>
             <CardHeader>
+              <CardTitle>Manage Profile</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">Update your profile picture.</p>
+              <Button asChild>
+                <Link href="/admin/profile">Manage Profile</Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Manage Skills</CardTitle>
             </CardHeader>
             <CardContent>

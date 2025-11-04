@@ -6,6 +6,7 @@ export interface ILinks extends Document {
   resumeUrl: string;
   x: string;
   email: string;
+  profilePhotoUrl: string;
 }
 
 const LinksSchema: Schema<ILinks> = new Schema({
@@ -24,6 +25,9 @@ const LinksSchema: Schema<ILinks> = new Schema({
   email: {
     type: String,
   },
+  profilePhotoUrl: {
+    type: String,
+  }
 });
 
 const Links: Model<ILinks> = models.Links || mongoose.model<ILinks>('Links', LinksSchema);
