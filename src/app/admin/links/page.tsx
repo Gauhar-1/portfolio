@@ -21,6 +21,8 @@ import { Loader2 } from 'lucide-react';
 const linksSchema = z.object({
   github: z.string().url('Please enter a valid URL.').optional().or(z.literal('')),
   linkedin: z.string().url('Please enter a valid URL.').optional().or(z.literal('')),
+  x: z.string().url('Please enter a valid URL.').optional().or(z.literal('')),
+  email: z.string().email('Please enter a valid email.').optional().or(z.literal('')),
   resumeUrl: z.string().url('Please enter a valid URL.').optional().or(z.literal('')),
 });
 
@@ -37,6 +39,8 @@ export default function ManageLinksPage() {
     defaultValues: {
       github: '',
       linkedin: '',
+      x: '',
+      email: '',
       resumeUrl: '',
     },
   });
@@ -130,6 +134,32 @@ export default function ManageLinksPage() {
                         <FormLabel>LinkedIn URL</FormLabel>
                         <FormControl>
                             <Input placeholder="https://linkedin.com/in/your-profile" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <FormField
+                    control={form.control}
+                    name="x"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>X (Twitter) URL</FormLabel>
+                        <FormControl>
+                            <Input placeholder="https://x.com/your-username" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Email Address</FormLabel>
+                        <FormControl>
+                            <Input placeholder="your.email@example.com" {...field} />
                         </FormControl>
                         <FormMessage />
                         </FormItem>

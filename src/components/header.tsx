@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Github, Linkedin, Download, Loader2 } from 'lucide-react';
+import { Menu, X, Github, Linkedin, Download, Loader2, Mail, Twitter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { NAV_LINKS } from '@/lib/data';
@@ -11,6 +11,8 @@ type Links = {
   github?: string;
   linkedin?: string;
   resumeUrl?: string;
+  x?: string;
+  email?: string;
 };
 
 const Header = () => {
@@ -65,19 +67,31 @@ const Header = () => {
                   Resume
                 </a>
               </Button>
-              <div className="hidden md:flex items-center space-x-2">
-                <a href={links.github || '#'} target="_blank" rel="noopener noreferrer">
+              <div className="hidden md:flex items-center space-x-1">
+                {links.github && <a href={links.github} target="_blank" rel="noopener noreferrer">
                   <Button variant="ghost" size="icon">
                     <Github className="h-5 w-5" />
                     <span className="sr-only">GitHub</span>
                   </Button>
-                </a>
-                <a href={links.linkedin || '#'} target="_blank" rel="noopener noreferrer">
+                </a>}
+                {links.linkedin && <a href={links.linkedin} target="_blank" rel="noopener noreferrer">
                   <Button variant="ghost" size="icon">
                     <Linkedin className="h-5 w-5" />
                     <span className="sr-only">LinkedIn</span>
                   </Button>
-                </a>
+                </a>}
+                {links.x && <a href={links.x} target="_blank" rel="noopener noreferrer">
+                  <Button variant="ghost" size="icon">
+                    <Twitter className="h-5 w-5" />
+                    <span className="sr-only">X</span>
+                  </Button>
+                </a>}
+                {links.email && <a href={`mailto:${links.email}`}>
+                  <Button variant="ghost" size="icon">
+                    <Mail className="h-5 w-5" />
+                    <span className="sr-only">Email</span>
+                  </Button>
+                </a>}
               </div>
             </>
           )}
@@ -107,21 +121,33 @@ const Header = () => {
                   </Link>
                 ))}
                 </nav>
-                <div className="mt-auto flex items-center gap-4">
+                <div className="mt-auto flex items-center gap-2">
                   {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : (
                     <>
-                      <a href={links.github || '#'} target="_blank" rel="noopener noreferrer">
+                      {links.github && <a href={links.github} target="_blank" rel="noopener noreferrer">
                           <Button variant="outline" size="icon">
                               <Github className="h-5 w-5" />
                               <span className="sr-only">GitHub</span>
                           </Button>
-                      </a>
-                      <a href={links.linkedin || '#'} target="_blank" rel="noopener noreferrer">
+                      </a>}
+                      {links.linkedin && <a href={links.linkedin} target="_blank" rel="noopener noreferrer">
                           <Button variant="outline" size="icon">
                               <Linkedin className="h-5 w-5" />
                               <span className="sr-only">LinkedIn</span>
                           </Button>
-                      </a>
+                      </a>}
+                      {links.x && <a href={links.x} target="_blank" rel="noopener noreferrer">
+                          <Button variant="outline" size="icon">
+                              <Twitter className="h-5 w-5" />
+                              <span className="sr-only">X</span>
+                          </Button>
+                      </a>}
+                      {links.email && <a href={`mailto:${links.email}`}>
+                          <Button variant="outline" size="icon">
+                              <Mail className="h-5 w-5" />
+                              <span className="sr-only">Email</span>
+                          </Button>
+                      </a>}
                     </>
                   )}
                 </div>

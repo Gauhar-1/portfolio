@@ -6,7 +6,6 @@ import Links from '@/models/Links';
 export async function GET() {
   await dbConnect();
   try {
-    // There should only ever be one document in this collection
     const links = await Links.findOne({});
     return NextResponse.json(links, { status: 200 });
   } catch (error) {
@@ -19,8 +18,7 @@ export async function POST(req: NextRequest) {
   await dbConnect();
   try {
     const body = await req.json();
-    // Use findOneAndUpdate with upsert:true to create the document if it doesn't exist,
-    // or update it if it does.
+    console.log("Body", body);
     const updatedLinks = await Links.findOneAndUpdate({}, body, {
       new: true,
       upsert: true,

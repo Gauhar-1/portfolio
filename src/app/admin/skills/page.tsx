@@ -31,7 +31,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Edit, Loader2, PlusCircle, Trash2 } from 'lucide-react';
+import { Check, ChevronDown, Edit, Loader2, PlusCircle, Trash2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,6 +43,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 const skillSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
@@ -197,9 +198,17 @@ export default function ManageSkillsPage() {
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Category</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Languages & Frameworks" {...field} />
+                        <DropdownMenu>
+                            <DropdownMenuTrigger><Button variant="outline" className="w-fit justify-between">{field.value || "Select Category"}<ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /></Button></DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              {skillCategories.map((s, index) => (
+                              <DropdownMenuItem key={index} onSelect={() =>field.onChange(s)}>
+                                {s}
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

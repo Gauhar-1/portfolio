@@ -204,14 +204,14 @@ export default function ManageExperiencePage() {
               <DialogTitle>{editingExperience ? 'Edit Experience' : 'Add New Experience'}</DialogTitle>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-h-[80vh] overflow-y-auto pr-2">
-                <FormField control={form.control} name="title" render={({ field }) => ( <FormItem> <FormLabel>Job Title</FormLabel> <FormControl> <Input placeholder="e.g. Full Stack Developer" {...field} /> </FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="company" render={({ field }) => ( <FormItem> <FormLabel>Company</FormLabel> <FormControl> <Input placeholder="e.g. Google" {...field} /> </FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="date" render={({ field }) => ( <FormItem> <FormLabel>Date</FormLabel> <FormControl> <Input placeholder="e.g. Jan 2023 - Present" {...field} /> </FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="description" render={({ field }) => ( <FormItem> <FormLabel>Description</FormLabel> <FormControl> <Textarea placeholder="Describe your role and responsibilities..." {...field} /> </FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="technologies" render={({ field }) => ( <FormItem> <FormLabel>Technologies (comma-separated)</FormLabel> <FormControl> <Input placeholder="e.g. React, Node.js, MongoDB" {...field} /> </FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="links.website" render={({ field }) => ( <FormItem> <FormLabel>Website URL</FormLabel> <FormControl> <Input placeholder="https://example.com" {...field} /> </FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="links.github" render={({ field }) => ( <FormItem> <FormLabel>GitHub URL</FormLabel> <FormControl> <Input placeholder="https://github.com/user/repo" {...field} /> </FormControl> <FormMessage /> </FormItem> )} />
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-h-[80vh] overflow-y-auto px-2 ">
+                <FormField control={form.control} name="title" render={({ field }) => ( <FormItem> <FormLabel>Job Title</FormLabel> <FormControl><Input placeholder="e.g. Full Stack Developer" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
+                <FormField control={form.control} name="company" render={({ field }) => ( <FormItem> <FormLabel>Company</FormLabel> <FormControl><Input placeholder="e.g. Google" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
+                <FormField control={form.control} name="date" render={({ field }) => ( <FormItem> <FormLabel>Date</FormLabel> <FormControl><Input placeholder="e.g. Jan 2023 - Present" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
+                <FormField control={form.control} name="description" render={({ field }) => ( <FormItem> <FormLabel>Description</FormLabel> <FormControl><Textarea placeholder="Describe your role and responsibilities..." {...field} /></FormControl> <FormMessage /> </FormItem> )} />
+                <FormField control={form.control} name="technologies" render={({ field }) => ( <FormItem> <FormLabel>Technologies (comma-separated)</FormLabel> <FormControl><Input placeholder="e.g. React, Node.js, MongoDB" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
+                <FormField control={form.control} name="links.website" render={({ field }) => ( <FormItem> <FormLabel>Website URL</FormLabel> <FormControl><Input placeholder="https://example.com" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
+                <FormField control={form.control} name="links.github" render={({ field }) => ( <FormItem> <FormLabel>GitHub URL</FormLabel> <FormControl ><Input placeholder="https://github.com/user/repo" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
                 
                 <Button type="submit" disabled={isSubmitting} className="mt-4">
                   {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</> : 'Save Experience'}

@@ -12,6 +12,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { useEffect, useState } from 'react';
+import { PROJECT_SPOTLIGHT_DATA } from '@/lib/data';
 
 type Project = {
   _id: string;
@@ -40,7 +41,12 @@ const ProjectSpotlight = () => {
           throw new Error('Failed to fetch projects');
         }
         const data: Project[] = await res.json();
-        setProjects(data);
+        const regularProjects = data.filter(p => p.title !== PROJECT_SPOTLIGHT_DATA.title);
+        const specialProject = data.find(p => p.title === PROJECT_SPOTLIGHT_DATA.title);
+        
+        const sortedProjects = specialProject ? [specialProject, ...regularProjects] : regularProjects;
+
+        setProjects(sortedProjects);
       } catch (error) {
         console.error(error);
       } finally {
@@ -64,75 +70,88 @@ const ProjectSpotlight = () => {
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-stretch">
             {projects.map((project, index) => (
               <Card 
                 key={project._id} 
-                className="flex flex-col transform transition-all duration-300 hover:-translate-y-2 animate-slide-in-from-bottom opacity-0 fill-mode-forwards shadow-md hover:shadow-xl hover:shadow-primary/20"
-                style={{ animationDelay: `${index * 0.2}s` }}
+                className={`flex flex-col transform transition-all duration-300 hover:-translate-y-2 animate-slide-in-from-bottom opacity-0 fill-mode-forwards shadow-lg hover:shadow-xl hover:shadow-primary/20 
+                  ${index === 0 ? 'md:col-span-2' : ''}`}
+                style={{ animationDelay: `${index * 0.15}s` }}
               >
-                <CardHeader>
-                  <CardTitle className="text-primary">{project.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="flex-grow space-y-6">
-                  {project._id === 'lan-communicator' ? ( // This is a temporary way to identify the special project
-                    <Carousel className="w-full max-w-full mx-auto">
-                      <CarouselContent>
-                        {screenshots.map((img) => (
-                          <CarouselItem key={img.id}>
-                            <div className="aspect-video relative">
-                                <Image
-                                  src={img.imageUrl}
-                                  alt={img.description}
-                                  fill
-                                  className="rounded-md object-cover"
-                                  data-ai-hint={img.imageHint}
-                                />
-                              </div>
-                          </CarouselItem>
-                        ))}
-                      </CarouselContent>
-                      <CarouselPrevious className="ml-12" />
-                      <CarouselNext className="mr-12" />
-                    </Carousel>
-                  ) : project.imageUrl ? (
-                    <div className="aspect-video relative overflow-hidden rounded-md">
-                      <Image
-                        src={project.imageUrl}
-                        alt={`${project.title} screenshot`}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    </div>
-                  ) : null}
+                <div className={`grid grid-cols-1 ${index === 0 ? 'md:grid-cols-2' : ''} gap-6 h-full`}>
                   
-                  <p className="text-muted-foreground">{project.description}</p>
-                  
-                  <div>
-                    <h4 className="font-semibold mb-3">Technologies:</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {project.technologies.map(tech => <Badge key={tech} variant="default">{tech}</Badge>)}
-                    </div>
+                  {/* Image/Carousel Section */}
+                  <div className={`relative ${index === 0 ? 'order-1' : 'order-1'}`}>
+                    {index === 0 ? (
+                      <Carousel className="w-full h-full">
+                        <CarouselContent className="h-full">
+                          {screenshots.map((img) => (
+                            <CarouselItem key={img.id}>
+                              <div className="aspect-video relative h-full">
+                                  <Image
+                                    src={img.imageUrl}
+                                    alt={img.description}
+                                    fill
+                                    className="rounded-t-lg md:rounded-l-lg md:rounded-r-none object-cover"
+                                    data-ai-hint={img.imageHint}
+                                  />
+                                </div>
+                            </CarouselItem>
+                          ))}
+                        </CarouselContent>
+                        <CarouselPrevious className="ml-16" />
+                        <CarouselNext className="mr-16" />
+                      </Carousel>
+                    ) : project.imageUrl ? (
+                      <div className="aspect-video relative overflow-hidden rounded-t-lg">
+                        <Image
+                          src={project.imageUrl}
+                          alt={`${project.title} screenshot`}
+                          fill
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      </div>
+                    ) : (
+                       <div className="aspect-video bg-muted rounded-t-lg flex items-center justify-center">
+                          <p className="text-muted-foreground">No Image</p>
+                       </div>
+                    )}
                   </div>
 
-                </CardContent>
-                <CardFooter className="flex items-center gap-4 pt-4 mt-auto">
-                  {project.links?.website && (
-                    <a href={project.links.website} target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
-                      <ExternalLink className="mr-1.5 h-4 w-4" /> Website
-                    </a>
-                  )}
-                  {project.links?.github && (
-                    <a href={project.links.github} target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
-                      <Github className="mr-1.5 h-4 w-4" /> GitHub
-                    </a>
-                  )}
-                  {project.links?.demo && (
-                    <a href={project.links.demo} target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
-                      <PlayCircle className="mr-1.5 h-4 w-4" /> Demo
-                    </a>
-                  )}
-                </CardFooter>
+                  {/* Content Section */}
+                  <div className={`flex flex-col p-6 ${index === 0 ? 'order-2' : 'order-2'}`}>
+                    <CardHeader className="p-0 mb-4">
+                      <CardTitle className="text-primary text-2xl">{project.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0 flex-grow space-y-4">
+                      <p className="text-muted-foreground">{project.description}</p>
+                      <div>
+                        <h4 className="font-semibold mb-3">Technologies:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {project.technologies.map(tech => <Badge key={tech} variant="default">{tech}</Badge>)}
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="p-0 flex items-center gap-4 pt-4 mt-auto">
+                      {project.links?.website && (
+                        <a href={project.links.website} target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+                          <ExternalLink className="mr-1.5 h-4 w-4" /> Website
+                        </a>
+                      )}
+                      {project.links?.github && (
+                        <a href={project.links.github} target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+                          <Github className="mr-1.5 h-4 w-4" /> GitHub
+                        </a>
+                      )}
+                      {project.links?.demo && (
+                        <a href={project.links.demo} target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+                          <PlayCircle className="mr-1.5 h-4 w-4" /> Demo
+                        </a>
+                      )}
+                    </CardFooter>
+                  </div>
+
+                </div>
               </Card>
             ))}
           </div>

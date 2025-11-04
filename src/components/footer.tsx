@@ -1,12 +1,14 @@
 'use client';
 
-import { Github, Linkedin, Loader2 } from 'lucide-react';
+import { Github, Linkedin, Loader2, Mail, Twitter } from 'lucide-react';
 import { Button } from './ui/button';
 import { useEffect, useState } from 'react';
 
 type Links = {
   github?: string;
   linkedin?: string;
+  x?: string;
+  email?: string;
 };
 
 const Footer = () => {
@@ -39,18 +41,38 @@ const Footer = () => {
         <div className="flex items-center space-x-2">
           {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : (
             <>
-              <a href={links.github || '#'} target="_blank" rel="noopener noreferrer">
-                <Button variant="ghost" size="icon">
-                  <Github className="h-5 w-5" />
-                  <span className="sr-only">GitHub</span>
-                </Button>
-              </a>
-              <a href={links.linkedin || '#'} target="_blank" rel="noopener noreferrer">
-                <Button variant="ghost" size="icon">
-                  <Linkedin className="h-5 w-5" />
-                  <span className="sr-only">LinkedIn</span>
-                </Button>
-              </a>
+              {links.github && (
+                <a href={links.github} target="_blank" rel="noopener noreferrer">
+                  <Button variant="ghost" size="icon">
+                    <Github className="h-5 w-5" />
+                    <span className="sr-only">GitHub</span>
+                  </Button>
+                </a>
+              )}
+              {links.linkedin && (
+                <a href={links.linkedin} target="_blank" rel="noopener noreferrer">
+                  <Button variant="ghost" size="icon">
+                    <Linkedin className="h-5 w-5" />
+                    <span className="sr-only">LinkedIn</span>
+                  </Button>
+                </a>
+              )}
+              {links.x && (
+                <a href={links.x} target="_blank" rel="noopener noreferrer">
+                  <Button variant="ghost" size="icon">
+                    <Twitter className="h-5 w-5" />
+                    <span className="sr-only">X</span>
+                  </Button>
+                </a>
+              )}
+               {links.email && (
+                <a href={`mailto:${links.email}`}>
+                  <Button variant="ghost" size="icon">
+                    <Mail className="h-5 w-5" />
+                    <span className="sr-only">Email</span>
+                  </Button>
+                </a>
+              )}
             </>
           )}
         </div>

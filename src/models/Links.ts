@@ -4,6 +4,8 @@ export interface ILinks extends Document {
   github: string;
   linkedin: string;
   resumeUrl: string;
+  x: string;
+  email: string;
 }
 
 const LinksSchema: Schema<ILinks> = new Schema({
@@ -14,6 +16,12 @@ const LinksSchema: Schema<ILinks> = new Schema({
     type: String,
   },
   resumeUrl: {
+    type: String,
+  },
+  x: {
+    type: String,
+  },
+  email: {
     type: String,
   },
 });
