@@ -33,7 +33,7 @@ export const TechIcon = ({ name, className }: TechIconProps) => {
     react: Atom,
     nextjs: Code,
     nodejs: Server,
-    python: Code,
+    express: Code,
     postgresql: Database,
     mongodb: DatabaseZap,
     mysql: Database,

@@ -69,20 +69,20 @@ const HeroSection = () => {
                 <div className="mt-8 flex items-center justify-center md:justify-start gap-x-6 animate-fade-in [animation-delay:0.8s] opacity-0 fill-mode-forwards">
                     {isLoading ? <Loader2 className="h-7 w-7 animate-spin" /> : (
                     <>
-                        {links.github && <a href={links.github} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                            <Github className="h-7 w-7" />
+                        {links.github && <a href={links.github} target="_blank" rel="noopener noreferrer" className="text-muted-foreground  transition-colors">
+                            <Github className="h-7 w-7 hover:text-purple-600"  />
                             <span className="sr-only">GitHub</span>
                         </a>}
-                        {links.linkedin && <a href={links.linkedin} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                            <Linkedin className="h-7 w-7" />
+                        {links.linkedin && <a href={links.linkedin} target="_blank" rel="noopener noreferrer" className="text-muted-foreground  transition-colors">
+                            <Linkedin className="h-7 w-7 hover:text-blue-600" />
                             <span className="sr-only">LinkedIn</span>
                         </a>}
                         {links.x && <a href={links.x} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                             <Twitter className="h-7 w-7" />
                             <span className="sr-only">X</span>
                         </a>}
-                        {links.email && <a href={`mailto:${links.email}`} className="text-muted-foreground hover:text-foreground transition-colors">
-                            <Mail className="h-7 w-7" />
+                        {links.email && <a href={`mailto:${links.email}`} className="text-muted-foreground  transition-colors">
+                            <Mail className="h-7 w-7 hover:text-red-600" />
                             <span className="sr-only">Email</span>
                         </a>}
                     </>
