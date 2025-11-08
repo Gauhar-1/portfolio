@@ -12,7 +12,7 @@ export const PROJECT_SPOTLIGHT_DATA = {
         'Real-time text-based chat between multiple clients.',
         'Secure and fast file transfer of any size.',
         'Dynamic discovery of users on the network.',
-        'Simple and intuitive command-line interface.',
+        'Simple and intuitive command-line interface',
     ],
     technologies: ['Python', 'Socket Programming', 'Threading', 'Tkinter (for GUI version)'],
 };
