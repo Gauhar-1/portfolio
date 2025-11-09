@@ -75,14 +75,14 @@ const ProjectSpotlight = () => {
               <Card 
                 key={project._id} 
                 className={`flex flex-col transform transition-all duration-300 hover:-translate-y-2 animate-slide-in-from-bottom opacity-0 fill-mode-forwards shadow-lg hover:shadow-xl hover:shadow-primary/20 
-                  ${index === 0 ? 'md:col-span-2' : ''}`}
+                 `}
                 style={{ animationDelay: `${index * 0.15}s` }}
               >
-                <div className={`grid grid-cols-1 ${index === 0 ? 'md:grid-cols-2' : ''} gap-6 h-full`}>
+                <div className={`grid grid-cols-1  gap-6 h-full`}>
                   
                   {/* Image/Carousel Section : ADD LATER */}
-                  <div className={`p-2 relative ${index === 0 ? 'order-1' : 'order-1'}`}>
-                    {index !== 0 ? (
+                  <div className={`p-2 relative`}>
+                    {/* {index === 0 ? (
                       <Carousel className="w-full h-full">
                         <CarouselContent className="h-full">
                           {screenshots.map((img) => (
@@ -102,7 +102,8 @@ const ProjectSpotlight = () => {
                         <CarouselPrevious className="ml-16" />
                         <CarouselNext className="mr-16" />
                       </Carousel>
-                    ) : project.imageUrl ? (
+                    ) :  */}
+                   { project.imageUrl ? (
                       <div className="aspect-video relative overflow-hidden rounded-t-lg">
                         <Image
                           src={project.imageUrl}
@@ -128,7 +129,7 @@ const ProjectSpotlight = () => {
                       <div>
                         <h4 className="font-semibold mb-3">Technologies:</h4>
                         <div className="flex flex-wrap gap-2">
-                          {project.technologies.map(tech => <Badge key={tech} variant="default">{tech}</Badge>)}
+                          {project.technologies.map(tech => <Badge key={tech} variant="default" className='hover:cursor-pointer'>{tech}</Badge>)}
                         </div>
                       </div>
                     </CardContent>
