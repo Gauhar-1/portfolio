@@ -80,9 +80,9 @@ const ProjectSpotlight = () => {
               >
                 <div className={`grid grid-cols-1 ${index === 0 ? 'md:grid-cols-2' : ''} gap-6 h-full`}>
                   
-                  {/* Image/Carousel Section */}
-                  <div className={`relative ${index === 0 ? 'order-1' : 'order-1'}`}>
-                    {index === 0 ? (
+                  {/* Image/Carousel Section : ADD LATER */}
+                  <div className={`p-2 relative ${index === 0 ? 'order-1' : 'order-1'}`}>
+                    {index !== 0 ? (
                       <Carousel className="w-full h-full">
                         <CarouselContent className="h-full">
                           {screenshots.map((img) => (

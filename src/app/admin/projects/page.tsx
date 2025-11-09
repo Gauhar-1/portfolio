@@ -29,9 +29,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Edit, Loader2, PlusCircle, Trash2 } from 'lucide-react';
+import { Edit, Loader2, PlusCircle, Trash2, Upload } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -69,7 +69,10 @@ export default function ManageProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPhotoSubmitting, setIsPhotoSubmitting] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [currentPhoto, setCurrentPhoto] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(projectSchema),
@@ -88,6 +91,7 @@ export default function ManageProjectsPage() {
       if (!res.ok) throw new Error('Failed to fetch projects');
       const data = await res.json();
       setProjects(data);
+      
     } catch (error) {
       console.error(error);
       toast({
@@ -109,6 +113,7 @@ export default function ManageProjectsPage() {
 
     const dataToSend = {
       ...values,
+      imageUrl: currentPhoto,
       technologies: values.technologies.split(',').map(tech => tech.trim()),
     };
 
@@ -159,9 +164,51 @@ export default function ManageProjectsPage() {
       });
     }
   };
+
+  const onFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsPhotoSubmitting(true);
+    const formData = new FormData();
+    formData.append('projectPhoto', file);
+
+    try {
+      const res = await fetch('/api/projects/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to upload image');
+      }
+
+      const { url } = await res.json();
+      setCurrentPhoto(url);
+      
+      toast({
+        title: 'Profile Photo Updated!',
+        description: 'Your new profile photo has been saved.',
+      });
+    } catch (error: any) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: error.message || 'Could not update profile photo.',
+      });
+    } finally {
+      setIsPhotoSubmitting(false);
+       if(fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
   
   const openEditDialog = (project: Project) => {
     setEditingProject(project);
+    setCurrentPhoto(project.imageUrl ?? null);
     form.reset({
         ...project,
         technologies: Array.isArray(project.technologies) ? project.technologies.join(', ') : project.technologies,
@@ -206,7 +253,35 @@ export default function ManageProjectsPage() {
                 <FormField control={form.control} name="title" render={({ field }) => ( <FormItem> <FormLabel>Title</FormLabel> <FormControl><Input placeholder="e.g. Awesome Project" {...field} /></FormControl>  </FormItem> )} />
                 <FormField control={form.control} name="description" render={({ field }) => ( <FormItem> <FormLabel>Description</FormLabel> <FormControl><Textarea placeholder="Describe your project..." {...field} /></FormControl>  </FormItem> )} />
                 <FormField control={form.control} name="technologies" render={({ field }) => ( <FormItem> <FormLabel>Technologies (comma-separated)</FormLabel> <FormControl><Input placeholder="e.g. React, Node.js, MongoDB" {...field} /></FormControl>  </FormItem> )} />
-                <FormField control={form.control} name="imageUrl" render={({ field }) => ( <FormItem> <FormLabel>Image URL</FormLabel> <FormControl><Input placeholder="https://example.com/image.png" {...field} /></FormControl>  </FormItem> )} />
+                <FormField control={form.control} name="imageUrl" render={({ field }) => ( <FormItem> <FormLabel>Image URL</FormLabel> {currentPhoto ? <FormControl><Input placeholder="https://image.png" {...field} /></FormControl>
+                :<div className="relative mt-2">
+                                <FormControl>
+                                    <Input 
+                                        type="file" 
+                                        className="hidden" 
+                                        accept="image/*" 
+                                        onChange={onFileChange}
+                                        ref={fileInputRef}
+                                    />
+                                </FormControl>
+                                <Button 
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    disabled={isPhotoSubmitting}
+                                >
+                                    {isPhotoSubmitting ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Uploading...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Upload className="mr-2 h-4 w-4" />
+                                            Choose Photo
+                                        </>
+                                    )}
+                                </Button>
+                                </div>}  </FormItem> )} />
                 <FormField control={form.control} name="links.website" render={({ field }) => ( <FormItem> <FormLabel>Website URL</FormLabel> <FormControl><Input placeholder="https://example.com" {...field} /></FormControl>  </FormItem> )} />
                 <FormField control={form.control} name="links.github" render={({ field }) => ( <FormItem> <FormLabel>GitHub URL</FormLabel> <FormControl><Input placeholder="https://github.com/user/repo" {...field} /></FormControl>  </FormItem> )} />
                 <FormField control={form.control} name="links.demo" render={({ field }) => ( <FormItem> <FormLabel>Demo URL</FormLabel> <FormControl><Input placeholder="https://youtube.com/watch?v=..." {...field} /></FormControl>  </FormItem> )} />
