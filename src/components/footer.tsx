@@ -136,7 +136,7 @@ const Footer = () => {
             </div>
             <div className="flex items-center gap-2">
                 <Radio className="w-3 h-3" />
-                <span>TRANSMISSION_ENDED</span>
+                <span>TRANSMISSION_ENDED </span>
             </div>
         </div>
 
