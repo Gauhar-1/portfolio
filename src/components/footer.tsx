@@ -130,7 +130,7 @@ const Footer = () => {
         {/* --- BOTTOM BAR --- */}
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-mono text-slate-600 uppercase tracking-widest">
             <div className="flex items-center gap-4">
-                <span>&copy; {currentYear} GOHAR_KHAN</span>
+                <span>&copy; {currentYear} GOHAR_KHAN </span>
                 <span className="hidden md:inline text-slate-800">|</span>
                 <span className="hidden md:inline">AUTH_CODE: 8X-99</span>
             </div>
