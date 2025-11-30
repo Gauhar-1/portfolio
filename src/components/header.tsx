@@ -224,7 +224,7 @@ const Header = () => {
                         </div>
                         <div className="mt-6 text-center">
                             <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-bold uppercase tracking-widest text-xs" asChild>
-                                <a href={links.resumeUrl || '/resume.pdf'}>Download Resume</a>
+                                <a href={links.resumeUrl || '/resume.pdf'}>Download Resume </a>
                             </Button>
                         </div>
                     </div>
