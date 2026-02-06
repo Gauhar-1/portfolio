@@ -15,7 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { submitContactForm } from '@/app/actions';
 import { Loader2, Radio, Target, Terminal, Wifi, Activity } from 'lucide-react';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
@@ -29,7 +29,7 @@ type FormData = z.infer<typeof formSchema>;
 const ContactSection = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [logs, setLogs] = useState<string[]>(["SYSTEM_BOOT...", "SIGNAL_WEAK...", "ESTABLISHING_CONNECTION..."]);
+  const [logs, setLogs] = useState<string[]>([]);
   
   // HOLD BUTTON STATE
   const [holdProgress, setHoldProgress] = useState(0);
@@ -101,6 +101,14 @@ const ContactSection = () => {
     setIsHolding(false);
     setHoldProgress(0);
   }
+
+  useEffect(() => {
+  setLogs([
+    `[${new Date().toLocaleTimeString().split(' ')[0]}] SYSTEM_BOOT...`,
+    "SIGNAL_WEAK...",
+    "ESTABLISHING_CONNECTION..."
+  ]);
+}, []);
 
   return (
     <section id="contact" className="relative py-24 bg-black overflow-hidden min-h-screen flex items-center justify-center">

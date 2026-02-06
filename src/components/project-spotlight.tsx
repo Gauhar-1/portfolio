@@ -61,7 +61,7 @@ const ProjectSpotlight = () => {
     // (Total Width of Track) - (Viewport Width)
     const getScrollAmount = () => {
         let trackWidth = trackRef.current!.scrollWidth;
-        return -(trackWidth - window.innerWidth);
+        return -(trackWidth);
     };
 
     const tween = gsap.to(trackRef.current, {

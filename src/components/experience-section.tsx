@@ -52,29 +52,35 @@ const ExperienceSection = () => {
   }, []);
 
   useGSAP(() => {
-    if (isLoading || !experiences.length) return;
+  if (isLoading || !experiences.length || !sectionRef.current) return;
 
-    const sections = gsap.utils.toArray(".mission-file");
-    
-    const scrollTween = gsap.to(sections, {
-        xPercent: -100 * (sections.length - 1),
-        ease: "none",
-        scrollTrigger: {
-            trigger: triggerRef.current,
-            pin: true,
-            scrub: 1,
-            snap: 1 / (sections.length - 1),
-            end: "+=3000",
-            onUpdate: (self) => {
-                if (progressRef.current) {
-                    gsap.to(progressRef.current, { scaleX: self.progress, duration: 0.1 });
-                }
-            }
+  const sections = gsap.utils.toArray(".mission-file");
+  
+  // CALCULATE: Total width minus one screen width
+  const totalWidth = sectionRef.current.scrollWidth;
+  const scrollDistance = totalWidth - window.innerWidth;
+
+  const scrollTween = gsap.to(sections, {
+    x: -scrollDistance, // Move by exact pixels, not percentages
+    ease: "none",
+    scrollTrigger: {
+      trigger: triggerRef.current,
+      pin: true,
+      scrub: 1,
+      start: "top top",
+      // Match the scroll duration to the content width
+      end: () => `+=${scrollDistance}`, 
+      invalidateOnRefresh: true, // Crucial for responsive resizing
+      onUpdate: (self) => {
+        if (progressRef.current) {
+          gsap.to(progressRef.current, { scaleX: self.progress, duration: 0.1 });
         }
-    });
+      }
+    }
+  });
 
-    return () => { scrollTween.kill(); };
-  }, { scope: triggerRef, dependencies: [isLoading, experiences] });
+  return () => { scrollTween.kill(); };
+}, { scope: triggerRef, dependencies: [isLoading, experiences] });
 
   return (
     <section id="experience" className="bg-[#0f0f11] text-slate-200 overflow-hidden">
