@@ -5,7 +5,6 @@ import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
 
 export default function RootLayout({
   children,

@@ -22,7 +22,20 @@ const Header = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('');
   const [scrolled, setScrolled] = useState(false);
-  const [time, setTime] = useState('');
+  // Change this in Header.tsx:
+const [time, setTime] = useState(''); // Start empty
+
+useEffect(() => {
+  // Set initial time only after mounting on the client
+  const now = new Date();
+  setTime(now.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' }));
+  
+  const timer = setInterval(() => {
+    const now = new Date();
+    setTime(now.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' }));
+  }, 1000);
+  return () => clearInterval(timer);
+}, []);
 
   // --- 1. FETCH LINKS ---
   useEffect(() => {
@@ -43,12 +56,6 @@ const Header = () => {
 
   // --- 2. SYSTEM CLOCK & SCROLL SPY ---
   useEffect(() => {
-    // Clock
-    const timer = setInterval(() => {
-      const now = new Date();
-      setTime(now.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' }));
-    }, 1000);
-
     // Scroll Handler
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -67,7 +74,6 @@ const Header = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => {
-      clearInterval(timer);
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);

@@ -61,7 +61,7 @@ const ProjectSpotlight = () => {
     // (Total Width of Track) - (Viewport Width)
     const getScrollAmount = () => {
         let trackWidth = trackRef.current!.scrollWidth;
-        return -(trackWidth);
+        return -(trackWidth - window.innerWidth);
     };
 
     const tween = gsap.to(trackRef.current, {
@@ -72,7 +72,7 @@ const ProjectSpotlight = () => {
     ScrollTrigger.create({
       trigger: wrapperRef.current,
       start: "top top", // When top of section hits top of viewport
-      end: () => `+=${trackRef.current!.scrollWidth - window.innerWidth}`, // Scroll duration = horizontal width
+      end: () => `+=${Math.abs(getScrollAmount())}`, // Scroll duration = horizontal width
       pin: true,      // Lock the section in place
       animation: tween,
       scrub: 1,       // Smoothness

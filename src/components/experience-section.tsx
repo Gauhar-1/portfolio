@@ -56,30 +56,35 @@ const ExperienceSection = () => {
 
   const sections = gsap.utils.toArray(".mission-file");
   
-  // CALCULATE: Total width minus one screen width
-  const totalWidth = sectionRef.current.scrollWidth;
-  const scrollDistance = totalWidth - window.innerWidth;
+  // 1. Calculate the exact overflow width
+  const getScrollAmount = () => {
+    const trackWidth = sectionRef.current!.scrollWidth;
+    return -(trackWidth - window.innerWidth);
+  };
 
-  const scrollTween = gsap.to(sections, {
-    x: -scrollDistance, // Move by exact pixels, not percentages
+  // 2. Create the horizontal tween
+  const tween = gsap.to(sectionRef.current, {
+    x: getScrollAmount,
     ease: "none",
-    scrollTrigger: {
-      trigger: triggerRef.current,
-      pin: true,
-      scrub: 1,
-      start: "top top",
-      // Match the scroll duration to the content width
-      end: () => `+=${scrollDistance}`, 
-      invalidateOnRefresh: true, // Crucial for responsive resizing
-      onUpdate: (self) => {
-        if (progressRef.current) {
-          gsap.to(progressRef.current, { scaleX: self.progress, duration: 0.1 });
-        }
+  });
+
+  // 3. Create the ScrollTrigger
+  ScrollTrigger.create({
+    trigger: triggerRef.current,
+    start: "top",
+    // This makes the 'scrollable height' perfectly match the content width
+    end: () => `+=${Math.abs(getScrollAmount())}`,
+    pin: true,
+    animation: tween,
+    scrub: 1,
+    invalidateOnRefresh: true, // Recalculates if window is resized
+    onUpdate: (self) => {
+      if (progressRef.current) {
+        gsap.to(progressRef.current, { scaleX: self.progress, duration: 0.1 });
       }
     }
   });
 
-  return () => { scrollTween.kill(); };
 }, { scope: triggerRef, dependencies: [isLoading, experiences] });
 
   return (
