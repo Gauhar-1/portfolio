@@ -16,26 +16,30 @@ type Links = {
   email?: string;
 };
 
-const Header = () => {
+interface headerProps {
+  initialLinks: Links;
+}
+
+const Header = ({ initialLinks }: headerProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [links, setLinks] = useState<Links>({});
+  const [links, setLinks] = useState<Links>(initialLinks);
   const [isLoading, setIsLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('');
   const [scrolled, setScrolled] = useState(false);
   // Change this in Header.tsx:
-const [time, setTime] = useState(''); // Start empty
+  const [time, setTime] = useState(''); // Start empty
 
-useEffect(() => {
-  // Set initial time only after mounting on the client
-  const now = new Date();
-  setTime(now.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' }));
-  
-  const timer = setInterval(() => {
+  useEffect(() => {
+    // Set initial time only after mounting on the client
     const now = new Date();
     setTime(now.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' }));
-  }, 1000);
-  return () => clearInterval(timer);
-}, []);
+
+    const timer = setInterval(() => {
+      const now = new Date();
+      setTime(now.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' }));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // --- 1. FETCH LINKS ---
   useEffect(() => {
@@ -85,73 +89,73 @@ useEffect(() => {
         html { scroll-behavior: smooth; }
       `}</style>
 
-      <header 
+      <header
         className={cn(
-            "fixed top-0 z-50 w-full transition-all duration-300 border-b",
-            scrolled 
-                ? "bg-[#050505]/90 backdrop-blur-md border-emerald-900/30 py-2 shadow-[0_4px_30px_rgba(0,0,0,0.5)]" 
-                : "bg-transparent border-transparent py-4"
+          "fixed top-0 z-50 w-full transition-all duration-300 border-b",
+          scrolled
+            ? "bg-[#050505]/90 backdrop-blur-md border-emerald-900/30 py-2 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
+            : "bg-transparent border-transparent py-4"
         )}
       >
         {/* DECORATIVE TOP LINE (Only visible on scroll) */}
         <div className={cn(
-            "absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent transition-opacity duration-300",
-            scrolled ? "opacity-100" : "opacity-0"
+          "absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent transition-opacity duration-300",
+          scrolled ? "opacity-100" : "opacity-0"
         )}></div>
 
         <div className="container mx-auto px-4 flex h-14 items-center justify-between">
-          
+
           {/* --- LEFT: IDENTITY BLOCK --- */}
           <div className="flex items-center gap-6">
             <Link href="/" className="group flex items-center space-x-2">
               <div className="relative flex h-8 w-8 items-center justify-center bg-emerald-900/20 border border-emerald-500/50 rounded-sm overflow-hidden group-hover:bg-emerald-500 group-hover:border-emerald-500 transition-all duration-300">
-                  <span className="font-mono font-bold text-emerald-500 group-hover:text-black">OP</span>
-                  {/* Scan line */}
-                  <div className="absolute top-0 w-full h-[1px] bg-emerald-400/50 animate-scan-down opacity-50"></div>
+                <span className="font-mono font-bold text-emerald-500 group-hover:text-black">OP</span>
+                {/* Scan line */}
+                <div className="absolute top-0 w-full h-[1px] bg-emerald-400/50 animate-scan-down opacity-50"></div>
               </div>
               <div className="flex flex-col">
-                  <span className="font-bold text-white tracking-wider text-sm group-hover:text-emerald-400 transition-colors">GOHAR_KHAN</span>
-                  <span className="text-[9px] font-mono text-slate-500 tracking-[0.2em] group-hover:text-emerald-600 transition-colors">DEV_OPERATOR</span>
+                <span className="font-bold text-white tracking-wider text-sm group-hover:text-emerald-400 transition-colors">GOHAR_KHAN</span>
+                <span className="text-[9px] font-mono text-slate-500 tracking-[0.2em] group-hover:text-emerald-600 transition-colors">DEV_OPERATOR</span>
               </div>
             </Link>
 
             {/* --- SYSTEM STATUS (Desktop) --- */}
             <div className="hidden lg:flex items-center gap-4 border-l border-white/10 pl-6 ml-2">
-                <div className="flex items-center gap-2 text-[10px] font-mono text-emerald-600/70">
-                    <Wifi className="w-3 h-3" />
-                    <span>NET_ONLINE</span>
-                </div>
-                <div className="flex items-center gap-2 text-[10px] font-mono text-emerald-600/70">
-                    <Battery className="w-3 h-3" />
-                    <span>PWR_100%</span>
-                </div>
-                <div className="flex items-center gap-2 text-[10px] font-mono text-slate-500">
-                    <span>UTC {time}</span>
-                </div>
+              <div className="flex items-center gap-2 text-[10px] font-mono text-emerald-600/70">
+                <Wifi className="w-3 h-3" />
+                <span>NET_ONLINE</span>
+              </div>
+              <div className="flex items-center gap-2 text-[10px] font-mono text-emerald-600/70">
+                <Battery className="w-3 h-3" />
+                <span>PWR_100%</span>
+              </div>
+              <div className="flex items-center gap-2 text-[10px] font-mono text-slate-500">
+                <span>UTC {time}</span>
+              </div>
             </div>
           </div>
 
           {/* --- CENTER: TACTICAL NAVIGATION --- */}
           <nav className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map((link) => {
-                const isActive = activeSection === link.href.substring(1);
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                        "relative px-4 py-2 text-xs font-bold tracking-widest uppercase transition-all duration-300 hover:text-emerald-400",
-                        isActive ? "text-emerald-500" : "text-slate-400"
-                    )}
-                  >
-                    {isActive && (
-                        <div className="absolute inset-0 bg-emerald-500/5 border-x border-emerald-500/20 skew-x-[-12deg]"></div>
-                    )}
-                    <span className="relative z-10">{link.label}</span>
-                    {/* Active Indicator Dot */}
-                    {isActive && <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-emerald-500 rounded-full shadow-[0_0_8px_#10b981]"></div>}
-                  </Link>
-                );
+              const isActive = activeSection === link.href.substring(1);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    "relative px-4 py-2 text-xs font-bold tracking-widest uppercase transition-all duration-300 hover:text-emerald-400",
+                    isActive ? "text-emerald-500" : "text-slate-400"
+                  )}
+                >
+                  {isActive && (
+                    <div className="absolute inset-0 bg-emerald-500/5 border-x border-emerald-500/20 skew-x-[-12deg]"></div>
+                  )}
+                  <span className="relative z-10">{link.label}</span>
+                  {/* Active Indicator Dot */}
+                  {isActive && <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-emerald-500 rounded-full shadow-[0_0_8px_#10b981]"></div>}
+                </Link>
+              );
             })}
           </nav>
 
@@ -170,11 +174,11 @@ useEffect(() => {
                 </div>
 
                 {/* DOWNLOAD RESUME */}
-                <Button 
-                    variant="outline" 
-                    size="sm" 
-                    asChild
-                    className="hidden sm:flex border-emerald-500/30 text-emerald-500 hover:bg-emerald-500 hover:text-black uppercase tracking-widest text-[10px] font-bold h-8 bg-emerald-950/30"
+                <Button
+                  variant="outline"
+                  size="sm"
+                  asChild
+                  className="hidden sm:flex border-emerald-500/30 text-emerald-500 hover:bg-emerald-500 hover:text-black uppercase tracking-widest text-[10px] font-bold h-8 bg-emerald-950/30"
                 >
                   <a href={links.resumeUrl || '/MD-Gohar-Khan-Resume.pdf'} target="_blank" rel="noopener noreferrer">
                     <Download className="mr-2 h-3 w-3" />
@@ -192,48 +196,48 @@ useEffect(() => {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] border-l border-emerald-900/50 bg-[#0a0a0a]/95 backdrop-blur-xl p-0">
-                
+
                 {/* MOBILE MENU CONTENT */}
                 <div className="flex flex-col h-full relative overflow-hidden">
-                    {/* Background Grid */}
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none"></div>
+                  {/* Background Grid */}
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none"></div>
 
-                    {/* Header */}
-                    <div className="p-6 border-b border-white/10 flex items-center gap-3">
-                        <Activity className="w-5 h-5 text-emerald-500 animate-pulse" />
-                        <span className="font-mono text-sm font-bold text-white tracking-widest">TAC_MAP</span>
+                  {/* Header */}
+                  <div className="p-6 border-b border-white/10 flex items-center gap-3">
+                    <Activity className="w-5 h-5 text-emerald-500 animate-pulse" />
+                    <span className="font-mono text-sm font-bold text-white tracking-widest">TAC_MAP</span>
+                  </div>
+
+                  {/* Nav Links */}
+                  <nav className="flex flex-col p-6 gap-2">
+                    {NAV_LINKS.map((link, i) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="group flex items-center justify-between p-3 border border-white/5 hover:border-emerald-500/50 hover:bg-emerald-900/20 rounded-sm transition-all duration-300"
+                      >
+                        <span className="text-sm font-mono text-slate-400 group-hover:text-white uppercase tracking-wider">
+                          {link.label}
+                        </span>
+                        <span className="text-[10px] font-mono text-emerald-800 group-hover:text-emerald-500">0{i + 1}</span>
+                      </Link>
+                    ))}
+                  </nav>
+
+                  {/* Footer / Socials */}
+                  <div className="mt-auto p-6 border-t border-white/10 bg-black/20">
+                    <div className="flex justify-center gap-4">
+                      {links.github && <MobileSocial href={links.github} icon={<Github className="h-5 w-5" />} />}
+                      {links.linkedin && <MobileSocial href={links.linkedin} icon={<Linkedin className="h-5 w-5" />} />}
+                      {links.email && <MobileSocial href={`mailto:${links.email}`} icon={<Mail className="h-5 w-5" />} />}
                     </div>
-
-                    {/* Nav Links */}
-                    <nav className="flex flex-col p-6 gap-2">
-                        {NAV_LINKS.map((link, i) => (
-                          <Link
-                            key={link.href}
-                            href={link.href}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="group flex items-center justify-between p-3 border border-white/5 hover:border-emerald-500/50 hover:bg-emerald-900/20 rounded-sm transition-all duration-300"
-                          >
-                            <span className="text-sm font-mono text-slate-400 group-hover:text-white uppercase tracking-wider">
-                                {link.label}
-                            </span>
-                            <span className="text-[10px] font-mono text-emerald-800 group-hover:text-emerald-500">0{i+1}</span>
-                          </Link>
-                        ))}
-                    </nav>
-
-                    {/* Footer / Socials */}
-                    <div className="mt-auto p-6 border-t border-white/10 bg-black/20">
-                        <div className="flex justify-center gap-4">
-                             {links.github && <MobileSocial href={links.github} icon={<Github className="h-5 w-5" />} />}
-                             {links.linkedin && <MobileSocial href={links.linkedin} icon={<Linkedin className="h-5 w-5" />} />}
-                             {links.email && <MobileSocial href={`mailto:${links.email}`} icon={<Mail className="h-5 w-5" />} />}
-                        </div>
-                        <div className="mt-6 text-center">
-                            <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-bold uppercase tracking-widest text-xs" asChild>
-                                <a href={links.resumeUrl || '/resume.pdf'}>Download Resume </a>
-                            </Button>
-                        </div>
+                    <div className="mt-6 text-center">
+                      <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-bold uppercase tracking-widest text-xs" asChild>
+                        <a href={links.resumeUrl || '/resume.pdf'}>Download Resume </a>
+                      </Button>
                     </div>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
@@ -248,19 +252,19 @@ useEffect(() => {
 // --- HELPER COMPONENTS ---
 
 const SocialBtn = ({ href, icon, label }: { href: string, icon: React.ReactNode, label: string }) => (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="group relative p-2">
-        <div className="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/10 rounded-sm transition-colors"></div>
-        <div className="text-slate-400 group-hover:text-emerald-400 transition-colors">
-            {icon}
-        </div>
-        <span className="sr-only">{label}</span>
-    </a>
+  <a href={href} target="_blank" rel="noopener noreferrer" className="group relative p-2">
+    <div className="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/10 rounded-sm transition-colors"></div>
+    <div className="text-slate-400 group-hover:text-emerald-400 transition-colors">
+      {icon}
+    </div>
+    <span className="sr-only">{label}</span>
+  </a>
 );
 
 const MobileSocial = ({ href, icon }: { href: string, icon: React.ReactNode }) => (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 text-slate-400 hover:text-emerald-500 hover:border-emerald-500 transition-all rounded-sm">
-        {icon}
-    </a>
+  <a href={href} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 text-slate-400 hover:text-emerald-500 hover:border-emerald-500 transition-all rounded-sm">
+    {icon}
+  </a>
 );
 
 export default Header;

@@ -12,9 +12,13 @@ type Links = {
   email?: string;
 };
 
-const Footer = () => {
+interface footerProps{
+    initialLinks: Links
+}
+
+const Footer = ({initialLinks}: footerProps) => {
   const currentYear = new Date().getFullYear();
-  const [links, setLinks] = useState<Links>({});
+  const [links, setLinks] = useState<Links>(initialLinks);
   const [isLoading, setIsLoading] = useState(true);
 
   // --- FETCH LINKS ---
