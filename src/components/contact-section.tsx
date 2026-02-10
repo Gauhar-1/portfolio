@@ -234,7 +234,7 @@ const ContactSection = () => {
                                                                     {...field}
                                                                     onFocus={() => addLog("INPUT_DETECTED: NAME_FIELD")}
                                                                     className="h-12 bg-[#050505] border-[#222] text-emerald-100 font-mono rounded-none focus:border-emerald-600 focus:ring-0 focus:bg-[#0a0a0a] transition-all uppercase tracking-wider"
-                                                                    placeholder="ENTER ID..."
+                                                                    placeholder="ENTER NAME..."
                                                                 />
                                                             </div>
                                                         </FormControl>
@@ -254,7 +254,7 @@ const ContactSection = () => {
                                                                     {...field}
                                                                     onFocus={() => addLog("INPUT_DETECTED: EMAIL_FIELD")}
                                                                     className="h-12 bg-[#050505] border-[#222] text-emerald-100 font-mono rounded-none focus:border-emerald-600 focus:ring-0 focus:bg-[#0a0a0a] transition-all tracking-wider"
-                                                                    placeholder="SECURE FREQ..."
+                                                                    placeholder="ENTER EMAIL..."
                                                                 />
                                                             </div>
                                                         </FormControl>
@@ -281,7 +281,7 @@ const ContactSection = () => {
                                                                 }}
                                                                 rows={5}
                                                                 className="bg-[#050505] border-[#222] text-emerald-100 font-mono rounded-none focus:border-emerald-600 focus:ring-0 focus:bg-[#0a0a0a] transition-all resize-none p-4 leading-relaxed tracking-wide"
-                                                                placeholder="TYPE BRIEFING..."
+                                                                placeholder="TYPE MESSAGE..."
                                                             />
                                                         </div>
                                                     </FormControl>
