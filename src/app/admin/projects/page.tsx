@@ -56,13 +56,11 @@ const projectSchema = z.object({
   }).optional(),
 });
 
-
 type FormValues = z.infer<typeof projectSchema>;
 type Project = FormValues & { 
   _id?: string;
   technologies: string[] | string;
 };
-
 
 export default function ManageProjectsPage() {
   const { toast } = useToast();
@@ -71,7 +69,6 @@ export default function ManageProjectsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPhotoSubmitting, setIsPhotoSubmitting] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [currentPhoto, setCurrentPhoto] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<FormValues>({
@@ -91,7 +88,6 @@ export default function ManageProjectsPage() {
       if (!res.ok) throw new Error('Failed to fetch projects');
       const data = await res.json();
       setProjects(data);
-      
     } catch (error) {
       console.error(error);
       toast({
@@ -113,7 +109,6 @@ export default function ManageProjectsPage() {
 
     const dataToSend = {
       ...values,
-      imageUrl: currentPhoto,
       technologies: values.technologies.split(',').map(tech => tech.trim()),
     };
 
@@ -185,18 +180,20 @@ export default function ManageProjectsPage() {
       }
 
       const { url } = await res.json();
-      setCurrentPhoto(url);
+      
+      // Directly update the form field with the new URL
+      form.setValue('imageUrl', url, { shouldValidate: true });
       
       toast({
-        title: 'Profile Photo Updated!',
-        description: 'Your new profile photo has been saved.',
+        title: 'Photo Uploaded!',
+        description: 'Your project photo has been successfully uploaded.',
       });
     } catch (error: any) {
       console.error(error);
       toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
-        description: error.message || 'Could not update profile photo.',
+        description: error.message || 'Could not upload photo.',
       });
     } finally {
       setIsPhotoSubmitting(false);
@@ -208,10 +205,10 @@ export default function ManageProjectsPage() {
   
   const openEditDialog = (project: Project) => {
     setEditingProject(project);
-    setCurrentPhoto(project.imageUrl ?? null);
     form.reset({
         ...project,
         technologies: Array.isArray(project.technologies) ? project.technologies.join(', ') : project.technologies,
+        imageUrl: project.imageUrl || '',
     });
     setIsDialogOpen(true);
   };
@@ -250,41 +247,55 @@ export default function ManageProjectsPage() {
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-h-[80vh] overflow-y-auto px-2">
-                <FormField control={form.control} name="title" render={({ field }) => ( <FormItem> <FormLabel>Title</FormLabel> <FormControl><Input placeholder="e.g. Awesome Project" {...field} /></FormControl>  </FormItem> )} />
-                <FormField control={form.control} name="description" render={({ field }) => ( <FormItem> <FormLabel>Description</FormLabel> <FormControl><Textarea placeholder="Describe your project..." {...field} /></FormControl>  </FormItem> )} />
-                <FormField control={form.control} name="technologies" render={({ field }) => ( <FormItem> <FormLabel>Technologies (comma-separated)</FormLabel> <FormControl><Input placeholder="e.g. React, Node.js, MongoDB" {...field} /></FormControl>  </FormItem> )} />
-                <FormField control={form.control} name="imageUrl" render={({ field }) => ( <FormItem> <FormLabel>Image URL</FormLabel> {currentPhoto ? <FormControl><Input placeholder="https://image.png" {...field} /></FormControl>
-                :<div className="relative mt-2">
-                                <FormControl>
-                                    <Input 
-                                        type="file" 
-                                        className="hidden" 
-                                        accept="image/*" 
-                                        onChange={onFileChange}
-                                        ref={fileInputRef}
-                                    />
-                                </FormControl>
-                                <Button 
-                                    type="button"
-                                    onClick={() => fileInputRef.current?.click()}
-                                    disabled={isPhotoSubmitting}
-                                >
-                                    {isPhotoSubmitting ? (
-                                        <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Uploading...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Upload className="mr-2 h-4 w-4" />
-                                            Choose Photo
-                                        </>
-                                    )}
-                                </Button>
-                                </div>}  </FormItem> )} />
-                <FormField control={form.control} name="links.website" render={({ field }) => ( <FormItem> <FormLabel>Website URL</FormLabel> <FormControl><Input placeholder="https://example.com" {...field} /></FormControl>  </FormItem> )} />
-                <FormField control={form.control} name="links.github" render={({ field }) => ( <FormItem> <FormLabel>GitHub URL</FormLabel> <FormControl><Input placeholder="https://github.com/user/repo" {...field} /></FormControl>  </FormItem> )} />
-                <FormField control={form.control} name="links.demo" render={({ field }) => ( <FormItem> <FormLabel>Demo URL</FormLabel> <FormControl><Input placeholder="https://youtube.com/watch?v=..." {...field} /></FormControl>  </FormItem> )} />
+                <FormField control={form.control} name="title" render={({ field }) => ( <FormItem> <FormLabel>Title</FormLabel> <FormControl><Input placeholder="e.g. Awesome Project" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
+                <FormField control={form.control} name="description" render={({ field }) => ( <FormItem> <FormLabel>Description</FormLabel> <FormControl><Textarea placeholder="Describe your project..." {...field} /></FormControl> <FormMessage /> </FormItem> )} />
+                <FormField control={form.control} name="technologies" render={({ field }) => ( <FormItem> <FormLabel>Technologies (comma-separated)</FormLabel> <FormControl><Input placeholder="e.g. React, Node.js, MongoDB" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
+                
+                {/* UPGRADED IMAGE UPLOAD FIELD */}
+                <FormField control={form.control} name="imageUrl" render={({ field }) => ( 
+                  <FormItem> 
+                    <FormLabel>Image URL / Upload</FormLabel> 
+                    <div className="flex gap-2 items-center mt-2">
+                      <FormControl>
+                        <Input placeholder="https://image.png" {...field} className="flex-1" />
+                      </FormControl>
+                      
+                      <FormControl>
+                        <Input 
+                          type="file" 
+                          className="hidden" 
+                          accept="image/*" 
+                          onChange={onFileChange}
+                          ref={fileInputRef}
+                        />
+                      </FormControl>
+                      
+                      <Button 
+                        type="button"
+                        variant="secondary"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isPhotoSubmitting}
+                      >
+                        {isPhotoSubmitting ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="mr-2 h-4 w-4" />
+                            Upload Photo
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    <FormMessage />
+                  </FormItem> 
+                )} />
+
+                <FormField control={form.control} name="links.website" render={({ field }) => ( <FormItem> <FormLabel>Website URL</FormLabel> <FormControl><Input placeholder="https://example.com" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
+                <FormField control={form.control} name="links.github" render={({ field }) => ( <FormItem> <FormLabel>GitHub URL</FormLabel> <FormControl><Input placeholder="https://github.com/user/repo" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
+                <FormField control={form.control} name="links.demo" render={({ field }) => ( <FormItem> <FormLabel>Demo URL</FormLabel> <FormControl><Input placeholder="https://youtube.com/watch?v=..." {...field} /></FormControl> <FormMessage /> </FormItem> )} />
                 
                 <Button type="submit" disabled={isSubmitting} className="mt-4">
                   {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</> : 'Save Project'}

@@ -48,14 +48,7 @@ export default function Home() {
 
   return (
     <div className="bg-[#080808] min-h-screen relative">
-      {!isAdminPage && <Header initialLinks={links || {}} />}
-      
-      {/* STAR ENGINEER FIX: 
-        1. Removed 'flex flex-col' so GSAP's pin-spacer works flawlessly.
-        2. Added 'overflow-x-hidden' to prevent horizontal scrollbars from 
-           appearing during the GSAP wipe animations.
-        3. Used a <main> tag for better semantic HTML.
-      */}
+      {/* {!isAdminPage && <Header initialLinks={links || {}} />} */}
       <main className="relative w-full overflow-x-hidden block">
         <HeroSection initialLinks={links || {}} />
         <SkillsSection />

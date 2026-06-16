@@ -10,6 +10,7 @@ import { useEffect, useState, useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import Loader from './liquidLoader';
+import Header from './header';
 
 gsap.registerPlugin(useGSAP);
 
@@ -117,6 +118,8 @@ const HeroSection = ({ initialLinks }: heroProps) => {
             background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20 L40 10 L40 30 L20 40 L0 30 L0 10 Z' fill='none' stroke='%231e293b' stroke-width='0.5' opacity='0.3'/%3E%3C/svg%3E");
         }
       `}</style>
+            
+            <Header initialLinks={initialLinks} />
 
             {/* --- BACKGROUND LAYERS --- */}
             <div className="absolute inset-0 pointer-events-none">
