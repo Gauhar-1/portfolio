@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -55,6 +56,7 @@ const experienceSchema = z.object({
     website: z.string().url().optional().or(z.literal('')),
     github: z.string().url().optional().or(z.literal('')),
   }).optional(),
+  allowedPersonas: z.array(z.string()).default([]),
 });
 
 type FormValues = z.infer<typeof experienceSchema>;
@@ -67,6 +69,7 @@ type Experience = FormValues & {
 export default function ManageExperiencePage() {
   const { toast } = useToast();
   const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [personas, setPersonas] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingExperience, setEditingExperience] = useState<Experience | null>(null);
@@ -80,27 +83,35 @@ export default function ManageExperiencePage() {
       description: '',
       technologies: '',
       links: { website: '', github: '' },
+      allowedPersonas: [],
     },
   });
 
-  const fetchExperiences = async () => {
+  const fetchExperiencesAndPersonas = async () => {
     try {
-      const res = await fetch('/api/experience');
-      if (!res.ok) throw new Error('Failed to fetch experiences');
-      const data = await res.json();
-      setExperiences(data);
+      const [resExperiences, resPersonas] = await Promise.all([
+        fetch('/api/experience'),
+        fetch('/api/personas')
+      ]);
+      if (!resExperiences.ok || !resPersonas.ok) throw new Error('Failed to fetch data');
+      const [dataExperiences, dataPersonas] = await Promise.all([
+        resExperiences.json(),
+        resPersonas.json()
+      ]);
+      setExperiences(dataExperiences);
+      setPersonas(dataPersonas);
     } catch (error) {
       console.error(error);
       toast({
         variant: 'destructive',
-        title: 'Failed to load experiences.',
+        title: 'Failed to load data.',
         description: 'Please try again later.',
       });
     }
   };
 
   useEffect(() => {
-    fetchExperiences();
+    fetchExperiencesAndPersonas();
   }, []);
 
   const onSubmit = async (values: FormValues) => {
@@ -122,7 +133,7 @@ export default function ManageExperiencePage() {
 
       if (!res.ok) throw new Error(`Failed to ${editingExperience ? 'update' : 'create'} experience`);
 
-      await fetchExperiences();
+      await fetchExperiencesAndPersonas();
       toast({
         title: `Experience ${editingExperience ? 'Updated' : 'Created'}!`,
         description: `${values.title} has been successfully ${editingExperience ? 'updated' : 'added'}.`,
@@ -146,7 +157,7 @@ export default function ManageExperiencePage() {
     try {
       const res = await fetch(`/api/experience/${experienceId}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete experience');
-      await fetchExperiences();
+      await fetchExperiencesAndPersonas();
       toast({
         title: 'Experience Deleted!',
         description: 'The experience has been successfully removed.',
@@ -166,6 +177,7 @@ export default function ManageExperiencePage() {
     form.reset({
         ...experience,
         technologies: Array.isArray(experience.technologies) ? experience.technologies.join(', ') : experience.technologies,
+        allowedPersonas: experience.allowedPersonas || [],
     });
     setIsDialogOpen(true);
   };
@@ -179,6 +191,7 @@ export default function ManageExperiencePage() {
       description: '',
       technologies: '',
       links: { website: '', github: '' },
+      allowedPersonas: [],
     });
     setIsDialogOpen(true);
   };
@@ -213,6 +226,50 @@ export default function ManageExperiencePage() {
                 <FormField control={form.control} name="links.website" render={({ field }) => ( <FormItem> <FormLabel>Website URL</FormLabel> <FormControl><Input placeholder="https://example.com" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
                 <FormField control={form.control} name="links.github" render={({ field }) => ( <FormItem> <FormLabel>GitHub URL</FormLabel> <FormControl ><Input placeholder="https://github.com/user/repo" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
                 
+                <FormField control={form.control} name="allowedPersonas" render={() => (
+                  <FormItem>
+                    <div className="mb-4">
+                      <FormLabel className="text-base">Target Personas</FormLabel>
+                      <p className="text-[0.8rem] text-muted-foreground">
+                        Select which personas this experience should be visible to. Leave blank to show for everyone.
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {personas.map((persona) => (
+                        <FormField
+                          key={persona._id}
+                          control={form.control}
+                          name="allowedPersonas"
+                          render={({ field }) => {
+                            return (
+                              <FormItem key={persona._id} className="flex flex-row items-start space-x-3 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(persona._id)}
+                                    onCheckedChange={(checked: boolean | 'indeterminate') => {
+                                      return checked === true
+                                        ? field.onChange([...(field.value || []), persona._id])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (value) => value !== persona._id
+                                            )
+                                          )
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  {persona.name}
+                                </FormLabel>
+                              </FormItem>
+                            )
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
                 <Button type="submit" disabled={isSubmitting} className="mt-4">
                   {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</> : 'Save Experience'}
                 </Button>

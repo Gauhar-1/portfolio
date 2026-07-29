@@ -40,6 +40,13 @@ type Message = {
   email: string;
   message: string;
   createdAt: string;
+  sessionId?: {
+    userAgent: string;
+    referrer: string;
+    pageviews: string[];
+    clickedProjects: any[];
+    inferredPersona?: { name: string };
+  };
 };
 
 export default function ManageMessagesPage() {
@@ -121,6 +128,32 @@ export default function ManageMessagesPage() {
                 <div className="mt-4 bg-muted p-4 rounded-md text-foreground max-h-80 overflow-y-auto">
                     <p>{selectedMessage?.message}</p>
                 </div>
+                {selectedMessage?.sessionId && (
+                  <div className="mt-6 border-t pt-4">
+                    <h3 className="text-lg font-semibold mb-2">Pre-Message Journey</h3>
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                      <div>
+                        <strong>Inferred Persona:</strong> {selectedMessage.sessionId.inferredPersona?.name || 'Unknown'}
+                      </div>
+                      <div>
+                        <strong>Device Info:</strong> {selectedMessage.sessionId.userAgent}
+                      </div>
+                      {selectedMessage.sessionId.pageviews?.length > 0 && (
+                        <div>
+                           <strong>Pages Visited:</strong> {selectedMessage.sessionId.pageviews.length}
+                        </div>
+                      )}
+                      {selectedMessage.sessionId.clickedProjects?.length > 0 && (
+                        <div>
+                           <strong>Projects Clicked:</strong> 
+                           <ul className="list-disc pl-5 mt-1">
+                             {selectedMessage.sessionId.clickedProjects.map((p, i) => <li key={i}>{p.title}</li>)}
+                           </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
             </DialogContent>
         </Dialog>
 

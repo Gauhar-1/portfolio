@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -54,6 +55,7 @@ const projectSchema = z.object({
     github: z.string().url().optional().or(z.literal('')),
     demo: z.string().url().optional().or(z.literal('')),
   }).optional(),
+  allowedPersonas: z.array(z.string()).default([]),
 });
 
 type FormValues = z.infer<typeof projectSchema>;
@@ -65,6 +67,7 @@ type Project = FormValues & {
 export default function ManageProjectsPage() {
   const { toast } = useToast();
   const [projects, setProjects] = useState<Project[]>([]);
+  const [personas, setPersonas] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPhotoSubmitting, setIsPhotoSubmitting] = useState(false);
@@ -79,27 +82,35 @@ export default function ManageProjectsPage() {
       technologies: '',
       imageUrl: '',
       links: { website: '', github: '', demo: '' },
+      allowedPersonas: [],
     },
   });
 
-  const fetchProjects = async () => {
+  const fetchProjectsAndPersonas = async () => {
     try {
-      const res = await fetch('/api/projects');
-      if (!res.ok) throw new Error('Failed to fetch projects');
-      const data = await res.json();
-      setProjects(data);
+      const [resProjects, resPersonas] = await Promise.all([
+        fetch('/api/projects'),
+        fetch('/api/personas')
+      ]);
+      if (!resProjects.ok || !resPersonas.ok) throw new Error('Failed to fetch data');
+      const [dataProjects, dataPersonas] = await Promise.all([
+        resProjects.json(),
+        resPersonas.json()
+      ]);
+      setProjects(dataProjects);
+      setPersonas(dataPersonas);
     } catch (error) {
       console.error(error);
       toast({
         variant: 'destructive',
-        title: 'Failed to load projects.',
+        title: 'Failed to load data.',
         description: 'Please try again later.',
       });
     }
   };
 
   useEffect(() => {
-    fetchProjects();
+    fetchProjectsAndPersonas();
   }, []);
 
   const onSubmit = async (values: FormValues) => {
@@ -121,7 +132,7 @@ export default function ManageProjectsPage() {
 
       if (!res.ok) throw new Error(`Failed to ${editingProject ? 'update' : 'create'} project`);
 
-      await fetchProjects();
+      await fetchProjectsAndPersonas();
       toast({
         title: `Project ${editingProject ? 'Updated' : 'Created'}!`,
         description: `${values.title} has been successfully ${editingProject ? 'updated' : 'added'}.`,
@@ -145,7 +156,7 @@ export default function ManageProjectsPage() {
     try {
       const res = await fetch(`/api/projects/${projectId}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete project');
-      await fetchProjects();
+      await fetchProjectsAndPersonas();
       toast({
         title: 'Project Deleted!',
         description: 'The project has been successfully removed.',
@@ -209,6 +220,7 @@ export default function ManageProjectsPage() {
         ...project,
         technologies: Array.isArray(project.technologies) ? project.technologies.join(', ') : project.technologies,
         imageUrl: project.imageUrl || '',
+        allowedPersonas: project.allowedPersonas || [],
     });
     setIsDialogOpen(true);
   };
@@ -221,6 +233,7 @@ export default function ManageProjectsPage() {
       technologies: '',
       imageUrl: '',
       links: { website: '', github: '', demo: '' },
+      allowedPersonas: [],
     });
     setIsDialogOpen(true);
   };
@@ -297,6 +310,50 @@ export default function ManageProjectsPage() {
                 <FormField control={form.control} name="links.github" render={({ field }) => ( <FormItem> <FormLabel>GitHub URL</FormLabel> <FormControl><Input placeholder="https://github.com/user/repo" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
                 <FormField control={form.control} name="links.demo" render={({ field }) => ( <FormItem> <FormLabel>Demo URL</FormLabel> <FormControl><Input placeholder="https://youtube.com/watch?v=..." {...field} /></FormControl> <FormMessage /> </FormItem> )} />
                 
+                <FormField control={form.control} name="allowedPersonas" render={() => (
+                  <FormItem>
+                    <div className="mb-4">
+                      <FormLabel className="text-base">Target Personas</FormLabel>
+                      <p className="text-[0.8rem] text-muted-foreground">
+                        Select which personas this project should be visible to. Leave blank to show for everyone.
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {personas.map((persona) => (
+                        <FormField
+                          key={persona._id}
+                          control={form.control}
+                          name="allowedPersonas"
+                          render={({ field }) => {
+                            return (
+                              <FormItem key={persona._id} className="flex flex-row items-start space-x-3 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(persona._id)}
+                                    onCheckedChange={(checked: boolean | 'indeterminate') => {
+                                      return checked === true
+                                        ? field.onChange([...(field.value || []), persona._id])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (value) => value !== persona._id
+                                            )
+                                          )
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  {persona.name}
+                                </FormLabel>
+                              </FormItem>
+                            )
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
                 <Button type="submit" disabled={isSubmitting} className="mt-4">
                   {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</> : 'Save Project'}
                 </Button>

@@ -10,6 +10,7 @@ export interface IProject extends Document {
     github?: string;
     demo?: string;
   };
+  allowedPersonas?: mongoose.Types.ObjectId[];
 }
 
 const ProjectSchema: Schema<IProject> = new Schema({
@@ -33,6 +34,7 @@ const ProjectSchema: Schema<IProject> = new Schema({
     github: String,
     demo: String,
   },
+  allowedPersonas: [{ type: Schema.Types.ObjectId, ref: 'Persona' }],
 });
 
 const Project: Model<IProject> = models.Project || mongoose.model<IProject>('Project', ProjectSchema);

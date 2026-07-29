@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Project from '@/models/Project';
+import { logAuditAction } from '@/lib/audit';
 
 // GET all projects
 export async function GET() {
@@ -19,6 +20,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const newProject = await Project.create(body);
+    await logAuditAction({ action: 'CREATE', entityType: 'Project', entityId: newProject._id as string, changes: body });
     return NextResponse.json(newProject, { status: 201 });
   } catch (error) {
     console.error(error);
@@ -44,6 +46,7 @@ export async function PUT(req: NextRequest) {
     if (!updatedProject) {
       return NextResponse.json({ message: 'Project not found' }, { status: 404 });
     }
+    await logAuditAction({ action: 'UPDATE', entityType: 'Project', entityId: updatedProject._id as string, changes: body });
     return NextResponse.json(updatedProject, { status: 200 });
   } catch (error) {
     console.error(error);
@@ -65,6 +68,7 @@ export async function DELETE(req: NextRequest) {
     if (!deletedProject) {
       return NextResponse.json({ message: 'Project not found' }, { status: 404 });
     }
+    await logAuditAction({ action: 'DELETE', entityType: 'Project', entityId: id });
     return NextResponse.json({ message: 'Project deleted' }, { status: 200 });
   } catch (error) {
     console.error(error);

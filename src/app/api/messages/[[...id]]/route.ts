@@ -2,12 +2,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Message from '@/models/Message';
+import Session from '@/models/Session'; // Import Session to ensure schema is loaded for populate
+import { logAuditAction } from '@/lib/audit';
 
 // GET all messages
 export async function GET() {
   await dbConnect();
   try {
-    const messages = await Message.find({}).sort({ createdAt: -1 });
+    const messages = await Message.find({})
+      .populate({
+        path: 'sessionId',
+        populate: { path: 'inferredPersona clickedProjects' }
+      })
+      .sort({ createdAt: -1 });
     return NextResponse.json(messages, { status: 200 });
   } catch (error) {
     return NextResponse.json({ message: 'Server Error' }, { status: 500 });
@@ -41,6 +48,7 @@ export async function DELETE(req: NextRequest) {
     if (!deletedMessage) {
       return NextResponse.json({ message: 'Message not found' }, { status: 404 });
     }
+    await logAuditAction({ action: 'DELETE', entityType: 'Message', entityId: id });
     return NextResponse.json({ message: 'Message deleted' }, { status: 200 });
   } catch (error) {
     console.error(error);

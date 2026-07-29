@@ -6,6 +6,7 @@ export interface IMessage extends Document {
   email: string;
   message: string;
   createdAt: Date;
+  sessionId?: mongoose.Types.ObjectId;
 }
 
 const MessageSchema: Schema<IMessage> = new Schema({
@@ -24,6 +25,10 @@ const MessageSchema: Schema<IMessage> = new Schema({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  sessionId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Session'
   },
 });
 

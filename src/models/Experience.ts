@@ -10,6 +10,7 @@ export interface IExperience extends Document {
     website?: string;
     github?: string;
   };
+  allowedPersonas?: mongoose.Types.ObjectId[];
 }
 
 const ExperienceSchema: Schema<IExperience> = new Schema({
@@ -37,6 +38,7 @@ const ExperienceSchema: Schema<IExperience> = new Schema({
     website: String,
     github: String,
   },
+  allowedPersonas: [{ type: Schema.Types.ObjectId, ref: 'Persona' }],
 });
 
 const Experience: Model<IExperience> = models.Experience || mongoose.model<IExperience>('Experience', ExperienceSchema);

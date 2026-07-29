@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Experience from '@/models/Experience';
+import { logAuditAction } from '@/lib/audit';
 
 // GET all experiences
 export async function GET() {
@@ -19,6 +20,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const newExperience = await Experience.create(body);
+    await logAuditAction({ action: 'CREATE', entityType: 'Experience', entityId: newExperience._id as string, changes: body });
     return NextResponse.json(newExperience, { status: 201 });
   } catch (error) {
     console.error(error);
@@ -44,6 +46,7 @@ export async function PUT(req: NextRequest) {
     if (!updatedExperience) {
       return NextResponse.json({ message: 'Experience not found' }, { status: 404 });
     }
+    await logAuditAction({ action: 'UPDATE', entityType: 'Experience', entityId: updatedExperience._id as string, changes: body });
     return NextResponse.json(updatedExperience, { status: 200 });
   } catch (error) {
     console.error(error);
@@ -65,6 +68,7 @@ export async function DELETE(req: NextRequest) {
     if (!deletedExperience) {
       return NextResponse.json({ message: 'Experience not found' }, { status: 404 });
     }
+    await logAuditAction({ action: 'DELETE', entityType: 'Experience', entityId: id });
     return NextResponse.json({ message: 'Experience deleted' }, { status: 200 });
   } catch (error) {
     console.error(error);

@@ -4,6 +4,7 @@ export interface ISkill extends Document {
   name: string;
   category: string;
   icon: string;
+  allowedPersonas?: mongoose.Types.ObjectId[];
 }
 
 const SkillSchema: Schema<ISkill> = new Schema({
@@ -22,6 +23,7 @@ const SkillSchema: Schema<ISkill> = new Schema({
     required: [true, 'Please provide an icon name.'],
     maxlength: [40, 'Icon name cannot be more than 40 characters'],
   },
+  allowedPersonas: [{ type: Schema.Types.ObjectId, ref: 'Persona' }],
 });
 
 const Skill: Model<ISkill> = models.Skill || mongoose.model<ISkill>('Skill', SkillSchema);
