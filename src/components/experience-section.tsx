@@ -6,6 +6,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { usePersona } from '@/context/PersonaContext';
+import { getSessionId } from '@/lib/telemetry';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -29,7 +30,7 @@ const ExperienceSection = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     const trackClick = (company: string) => {
-        const sessionId = localStorage.getItem('sessionId');
+        const sessionId = getSessionId();
         if (sessionId) {
             fetch('/api/telemetry', {
                 method: 'POST',

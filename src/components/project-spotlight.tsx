@@ -8,6 +8,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { PROJECT_SPOTLIGHT_DATA } from '@/lib/data';
 import { usePersona } from '@/context/PersonaContext';
+import { getSessionId } from '@/lib/telemetry';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -32,7 +33,7 @@ const ProjectSpotlight = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     const trackClick = (title: string) => {
-        const sessionId = localStorage.getItem('sessionId');
+        const sessionId = getSessionId();
         if (sessionId) {
             fetch('/api/telemetry', {
                 method: 'POST',

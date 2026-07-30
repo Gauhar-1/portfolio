@@ -25,7 +25,9 @@ export async function POST(req: Request) {
     );
 
     if (!session) {
-       return NextResponse.json({ message: 'Session not found' }, { status: 404 });
+       // Graceful degradation: if session was deleted from DB but cookie remains, 
+       // do not throw an error to the client, just ignore the telemetry ping.
+       return NextResponse.json({ success: false, message: 'Session not found (ignored)' }, { status: 200 });
     }
 
     return NextResponse.json({ success: true, newScore: session.intentScore }, { status: 200 });

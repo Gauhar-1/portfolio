@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode, useEffect, useRef, useState } from 'react';
+import { getSessionId } from '@/lib/telemetry';
 
 export default function StoryTelemetryObserver({ 
   children, 
@@ -26,7 +27,7 @@ export default function StoryTelemetryObserver({
         if (entry.isIntersecting) {
           // Dwell Time Tracking: > 15 seconds (+20 intent points)
           timeoutId = setTimeout(() => {
-            const sessionId = localStorage.getItem('sessionId');
+            const sessionId = getSessionId();
             if (sessionId) {
               fetch('/api/telemetry', {
                 method: 'POST',

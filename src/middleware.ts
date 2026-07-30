@@ -21,6 +21,14 @@ export async function middleware(req: NextRequest) {
 
   const { isLoggedIn } = session;
 
+  // 1. Gateway Bypass
+  if (req.nextUrl.pathname === '/') {
+    const sessionId = req.cookies.get('sessionId')?.value;
+    if (sessionId) {
+      return NextResponse.redirect(new URL('/overview', req.url));
+    }
+  }
+
   if (req.nextUrl.pathname.startsWith('/admin')) {
     if (!isLoggedIn) {
       return NextResponse.redirect(new URL('/login', req.url));
@@ -37,5 +45,14 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/login'],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
 };
