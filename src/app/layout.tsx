@@ -1,7 +1,7 @@
-
 import { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
+import { PersonaProvider } from '@/context/PersonaContext';
 
 export const metadata: Metadata = {
   title: 'MD Gohar Khan | Freelance Software Engineer & Full-Stack Developer',
@@ -37,8 +37,10 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased bg-background text-foreground">
-        <main>{children}</main>
-        <Toaster />
+        <PersonaProvider>
+          <main>{children}</main>
+          <Toaster />
+        </PersonaProvider>
       </body>
     </html>
   );

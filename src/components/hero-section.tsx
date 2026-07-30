@@ -11,6 +11,7 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import Loader from './liquidLoader';
 import Header from './header';
+import { usePersona } from '@/context/PersonaContext';
 
 gsap.registerPlugin(useGSAP);
 
@@ -85,6 +86,7 @@ interface heroProps {
 const HeroSection = ({ initialLinks }: heroProps) => {
     const [links] = useState<Links>(initialLinks);
     const containerRef = useRef<HTMLDivElement>(null);
+    const { activePersona } = usePersona();
 
     useGSAP(() => {
         const tl = gsap.timeline();
@@ -163,7 +165,7 @@ const HeroSection = ({ initialLinks }: heroProps) => {
                             <div>
                                 <div className="flex items-center gap-2 text-yellow-500 font-mono text-[10px] font-bold tracking-[0.3em] mb-2 uppercase">
                                     <Zap className="w-3 h-3 fill-yellow-500" />
-                                    Blueprint: Prestige Master
+                                    Blueprint: {activePersona?.name || 'Prestige Master'}
                                 </div>
                                 <h1 className="text-5xl md:text-7xl font-black text-white uppercase italic tracking-tighter leading-[0.9]">
                                     Gohar<span className="text-emerald-600">.Dev</span>
@@ -186,9 +188,13 @@ const HeroSection = ({ initialLinks }: heroProps) => {
                                         System Description
                                     </h3>
                                     <p className="text-sm text-slate-400 font-mono leading-relaxed text-justify">
-                                        High-caliber <span className="text-emerald-400">Full-Stack Architect</span> configured for rapid deployment in complex web environments.
-                                        Optimized for scalability, security, and low-latency performance.
-                                        Comes pre-equipped with advanced MERN stack integration.
+                                        {activePersona?.description || (
+                                            <>
+                                                High-caliber <span className="text-emerald-400">Full-Stack Architect</span> configured for rapid deployment in complex web environments.
+                                                Optimized for scalability, security, and low-latency performance.
+                                                Comes pre-equipped with advanced MERN stack integration.
+                                            </>
+                                        )}
                                     </p>
                                 </div>
 

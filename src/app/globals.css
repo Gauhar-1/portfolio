@@ -69,4 +69,28 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+
+  .theme-emerald {
+    --primary: 158 64% 52%; /* Emerald */
+    --accent: 43 74% 66%; /* Gold */
+    --ring: 158 64% 52%;
+  }
+
+  .theme-slate {
+    --primary: 215 25% 27%; /* Slate */
+    --accent: 221 83% 53%; /* Blue */
+    --ring: 215 25% 27%;
+  }
+
+  .theme-indigo {
+    --primary: 239 84% 67%; /* Indigo */
+    --accent: 271 91% 65%; /* Purple */
+    --ring: 239 84% 67%;
+  }
+
+  .theme-ocean {
+    --primary: 199 89% 48%; /* Ocean/Sky */
+    --accent: 171 77% 64%; /* Teal */
+    --ring: 199 89% 48%;
+  }
 }

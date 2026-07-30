@@ -27,8 +27,15 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import * as z from 'zod';
 import { useEffect, useRef, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -44,6 +51,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Card, CardContent } from '@/components/ui/card';
+
+const storyThemes = ['Problem Solved', 'Mistake Made', 'Conflict Resolved', 'Influenced Decision', 'Proudest Build'] as const;
+
+const storySchema = z.object({
+  theme: z.enum(storyThemes),
+  situation: z.string().min(5, 'Situation must be at least 5 characters.'),
+  challenge: z.string().min(5, 'Challenge must be at least 5 characters.'),
+  action: z.string().min(5, 'Action must be at least 5 characters.'),
+  result: z.string().min(5, 'Result must be at least 5 characters.'),
+  learning: z.string().min(5, 'Learning must be at least 5 characters.'),
+});
 
 const projectSchema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters.'),
@@ -56,6 +75,7 @@ const projectSchema = z.object({
     demo: z.string().url().optional().or(z.literal('')),
   }).optional(),
   allowedPersonas: z.array(z.string()).default([]),
+  stories: z.array(storySchema).default([]),
 });
 
 type FormValues = z.infer<typeof projectSchema>;
@@ -83,7 +103,13 @@ export default function ManageProjectsPage() {
       imageUrl: '',
       links: { website: '', github: '', demo: '' },
       allowedPersonas: [],
+      stories: [],
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'stories',
   });
 
   const fetchProjectsAndPersonas = async () => {
@@ -221,6 +247,7 @@ export default function ManageProjectsPage() {
         technologies: Array.isArray(project.technologies) ? project.technologies.join(', ') : project.technologies,
         imageUrl: project.imageUrl || '',
         allowedPersonas: project.allowedPersonas || [],
+        stories: project.stories || [],
     });
     setIsDialogOpen(true);
   };
@@ -234,6 +261,7 @@ export default function ManageProjectsPage() {
       imageUrl: '',
       links: { website: '', github: '', demo: '' },
       allowedPersonas: [],
+      stories: [],
     });
     setIsDialogOpen(true);
   };
@@ -353,6 +381,95 @@ export default function ManageProjectsPage() {
                     <FormMessage />
                   </FormItem>
                 )} />
+
+                {/* STORY BUILDER SECTION */}
+                <div className="space-y-4 pt-4 border-t border-border">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="text-lg font-bold">Story Builder (STAR Method)</h3>
+                      <p className="text-sm text-muted-foreground">Add behavioral stories to this project.</p>
+                    </div>
+                    <Button type="button" variant="outline" onClick={() => append({ theme: 'Problem Solved', situation: '', challenge: '', action: '', result: '', learning: '' })}>
+                      <PlusCircle className="mr-2 h-4 w-4" /> Add Story
+                    </Button>
+                  </div>
+                  
+                  {fields.map((field, index) => (
+                    <Card key={field.id} className="relative">
+                      <CardContent className="pt-6 space-y-4">
+                        <Button 
+                          type="button" 
+                          variant="ghost" 
+                          size="icon" 
+                          className="absolute top-2 right-2 text-destructive"
+                          onClick={() => remove(index)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                        
+                        <FormField control={form.control} name={`stories.${index}.theme`} render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Theme</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select a theme" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {storyThemes.map(theme => (
+                                  <SelectItem key={theme} value={theme}>{theme}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                        
+                        <FormField control={form.control} name={`stories.${index}.situation`} render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Situation (Context)</FormLabel>
+                            <FormControl><Textarea placeholder="What was the background context?" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+
+                        <FormField control={form.control} name={`stories.${index}.challenge`} render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Challenge (The Obstacle)</FormLabel>
+                            <FormControl><Textarea placeholder="What was the specific challenge or task?" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+
+                        <FormField control={form.control} name={`stories.${index}.action`} render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Action (What you did)</FormLabel>
+                            <FormControl><Textarea placeholder="What action did you personally take?" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+
+                        <FormField control={form.control} name={`stories.${index}.result`} render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Result (Measurable Outcome)</FormLabel>
+                            <FormControl><Textarea placeholder="What was the measurable outcome?" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+
+                        <FormField control={form.control} name={`stories.${index}.learning`} render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Learning (The Takeaway)</FormLabel>
+                            <FormControl><Textarea placeholder="What did you learn from this?" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                        
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
 
                 <Button type="submit" disabled={isSubmitting} className="mt-4">
                   {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</> : 'Save Project'}

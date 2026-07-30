@@ -7,12 +7,14 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { PROJECT_SPOTLIGHT_DATA } from '@/lib/data';
+import { usePersona } from '@/context/PersonaContext';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 type Project = {
     _id: string;
     title: string;
+    slug: string;
     description: string;
     technologies: string[];
     imageUrl?: string;
@@ -21,11 +23,28 @@ type Project = {
         github?: string;
         demo?: string;
     };
+    allowedPersonas?: string[];
 };
 
 const ProjectSpotlight = () => {
+    const { activePersona } = usePersona();
     const [projects, setProjects] = useState<Project[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+
+    const trackClick = (title: string) => {
+        const sessionId = localStorage.getItem('sessionId');
+        if (sessionId) {
+            fetch('/api/telemetry', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sessionId,
+                    score: 10,
+                    action: `Clicked Project Deep Dive: ${title}`
+                })
+            }).catch(console.error);
+        }
+    };
 
     const sectionRef = useRef<HTMLElement>(null);
     const trackRef = useRef<HTMLDivElement>(null);
@@ -42,8 +61,15 @@ const ProjectSpotlight = () => {
 
                 if (!isMounted) return;
 
-                const regularProjects = data.filter(p => p.title !== PROJECT_SPOTLIGHT_DATA.title);
-                const specialProject = data.find(p => p.title === PROJECT_SPOTLIGHT_DATA.title);
+                let filteredData = data;
+                if (activePersona) {
+                    filteredData = data.filter(p => 
+                        !p.allowedPersonas?.length || p.allowedPersonas.includes(activePersona._id)
+                    );
+                }
+
+                const regularProjects = filteredData.filter(p => p.title !== PROJECT_SPOTLIGHT_DATA.title);
+                const specialProject = filteredData.find(p => p.title === PROJECT_SPOTLIGHT_DATA.title);
                 const sortedProjects = specialProject ? [specialProject, ...regularProjects] : regularProjects;
 
                 setProjects(sortedProjects);
@@ -56,7 +82,7 @@ const ProjectSpotlight = () => {
         fetchProjects();
 
         return () => { isMounted = false; };
-    }, []);
+    }, [activePersona]);
 
     useGSAP(() => {
         if (isLoading || !projects.length || !trackRef.current || !sectionRef.current) return;
@@ -215,8 +241,15 @@ const ProjectSpotlight = () => {
                                             </div>
 
                                             <div className="flex gap-4">
+                                                <a 
+                                                    href={`/projects/${project._id}`} 
+                                                    onClick={() => trackClick(project.title)}
+                                                    className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-emerald-500 text-black font-black uppercase tracking-widest text-[10px] md:text-sm transition-all border-2 border-emerald-500 shadow-[4px_4px_0_0_#10b981] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] hover:bg-white hover:border-white"
+                                                >
+                                                    <Scan className="w-4 h-4" /> Deep Dive
+                                                </a>
                                                 {project.links?.website && (
-                                                    <a href={project.links.website} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-emerald-600 text-black font-black uppercase tracking-widest text-[10px] md:text-sm transition-all border-2 border-emerald-600 shadow-[4px_4px_0_0_#064e3b] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] hover:bg-white hover:border-white">
+                                                    <a href={project.links.website} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-emerald-900 text-emerald-100 font-black uppercase tracking-widest text-[10px] md:text-sm transition-all border-2 border-emerald-900 shadow-[4px_4px_0_0_#064e3b] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] hover:bg-white hover:text-black hover:border-white">
                                                         <Globe className="w-4 h-4" /> Live
                                                     </a>
                                                 )}

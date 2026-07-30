@@ -5,24 +5,43 @@ import { useEffect, useState, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import { usePersona } from '@/context/PersonaContext';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 type Experience = {
     _id: string;
     title: string;
+    slug: string;
     company: string;
     date: string;
     description: string;
     technologies: string[];
     links?: { website?: string; github?: string };
+    allowedPersonas?: string[];
 };
 
 const ROTATIONS = [-3, 4, -2, 5, -4, 3, -5, 2];
 
 const ExperienceSection = () => {
+    const { activePersona } = usePersona();
     const [experiences, setExperiences] = useState<Experience[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+
+    const trackClick = (company: string) => {
+        const sessionId = localStorage.getItem('sessionId');
+        if (sessionId) {
+            fetch('/api/telemetry', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sessionId,
+                    score: 10,
+                    action: `Clicked Experience Deep Dive: ${company}`
+                })
+            }).catch(console.error);
+        }
+    };
 
     const sectionRef = useRef<HTMLElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -34,8 +53,18 @@ const ExperienceSection = () => {
         const fetchExperiences = async () => {
             try {
                 const res = await fetch('/api/experience');
-                const data = await res.json();
-                if (isMounted) setExperiences(data || []);
+                const data: Experience[] = await res.json();
+                
+                if (!isMounted) return;
+
+                let filteredData = data;
+                if (activePersona) {
+                    filteredData = data.filter(xp => 
+                        !xp.allowedPersonas?.length || xp.allowedPersonas.includes(activePersona._id)
+                    );
+                }
+
+                setExperiences(filteredData || []);
             } catch (error) { 
                 console.error(error); 
             } finally { 
@@ -48,7 +77,7 @@ const ExperienceSection = () => {
         return () => {
             isMounted = false; // Cleanup to prevent memory leaks
         };
-    }, []);
+    }, [activePersona]);
 
     useGSAP(() => {
         if (isLoading || !experiences.length || !sectionRef.current) return;
@@ -153,6 +182,13 @@ const ExperienceSection = () => {
                                     </div>
 
                                     <div className="absolute bottom-6 right-6 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-4 group-hover:translate-y-0">
+                                        <a 
+                                            href={`/experience/${xp._id}`} 
+                                            onClick={() => trackClick(xp.company)}
+                                            className="px-4 py-2 bg-blue-500 text-white font-bold rounded-full transition-colors shadow-lg hover:bg-blue-600 flex items-center gap-2 uppercase tracking-widest text-xs"
+                                        >
+                                            <Target className="w-4 h-4" /> Narrative
+                                        </a>
                                         {xp.links?.website && (
                                             <a href={xp.links.website} target="_blank" rel="noreferrer" className="p-3 bg-white text-black hover:bg-amber-100 rounded-full transition-colors shadow-lg">
                                                 <ExternalLink className="w-5 h-5" />
