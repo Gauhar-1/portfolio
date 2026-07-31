@@ -53,7 +53,7 @@ export function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto bg-card border-r border-border">
+    <div className="flex h-full flex-col overflow-y-auto bg-card border-r border-border ">
       <div className="p-6">
         <h2 className="text-2xl font-bold tracking-tight text-primary">Admin Console</h2>
       </div>

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { PersonaProvider } from '@/context/PersonaContext';
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata: Metadata = {
   title: 'MD Gohar Khan | Freelance Software Engineer & Full-Stack Developer',
@@ -31,6 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
+        <Analytics />
         <title>DevFolio | Full-Stack Developer</title>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

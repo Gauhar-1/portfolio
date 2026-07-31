@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import StoryTelemetryObserver from '@/components/story-telemetry-observer';
+import ClientTracker from '@/components/client-tracker';
+import ExperienceLinks from '@/components/experience-links';
 
 const themeIcons: Record<string, React.ReactNode> = {
   'Problem Solved': <Target className="w-5 h-5" />,
@@ -43,6 +45,7 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <ClientTracker targetName={`/experience/${id}`} />
       <Header initialLinks={{ github: '', linkedin: '' }} />
       
       <main className="flex-1 w-full max-w-4xl mx-auto px-6 py-24 md:py-32">
@@ -79,18 +82,10 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
             {experience.description}
           </p>
 
-          <div className="flex gap-4 pt-4">
-            {experience.links?.website && (
-              <a 
-                href={experience.links.website} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center h-10 px-6 rounded-md bg-blue-500 text-white hover:bg-blue-600 font-medium transition-colors shadow-lg shadow-blue-500/20"
-              >
-                <ExternalLink className="w-4 h-4 mr-2" /> Visit Company
-              </a>
-            )}
-          </div>
+          <ExperienceLinks 
+            websiteUrl={experience.links?.website} 
+            companyName={experience.company} 
+          />
         </header>
 
         {experience.stories && experience.stories.length > 0 ? (

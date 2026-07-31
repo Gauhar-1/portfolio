@@ -10,36 +10,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, useFieldArray } from 'react-hook-form';
-import * as z from 'zod';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Edit, Loader2, PlusCircle, Trash2, Upload } from 'lucide-react';
+import { Edit, PlusCircle, Trash2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,80 +24,23 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Card, CardContent } from '@/components/ui/card';
 
-const storyThemes = ['Problem Solved', 'Mistake Made', 'Conflict Resolved', 'Influenced Decision', 'Proudest Build'] as const;
-
-const storySchema = z.object({
-  theme: z.enum(storyThemes),
-  situation: z.string().min(5, 'Situation must be at least 5 characters.'),
-  challenge: z.string().min(5, 'Challenge must be at least 5 characters.'),
-  action: z.string().min(5, 'Action must be at least 5 characters.'),
-  result: z.string().min(5, 'Result must be at least 5 characters.'),
-  learning: z.string().min(5, 'Learning must be at least 5 characters.'),
-});
-
-const projectSchema = z.object({
-  title: z.string().min(2, 'Title must be at least 2 characters.'),
-  description: z.string().min(10, 'Description must be at least 10 characters.'),
-  technologies: z.string().min(2, 'Please add at least one technology.'),
-  imageUrl: z.string().url().optional().or(z.literal('')),
-  links: z.object({
-    website: z.string().url().optional().or(z.literal('')),
-    github: z.string().url().optional().or(z.literal('')),
-    demo: z.string().url().optional().or(z.literal('')),
-  }).optional(),
-  allowedPersonas: z.array(z.string()).default([]),
-  stories: z.array(storySchema).default([]),
-});
-
-type FormValues = z.infer<typeof projectSchema>;
-type Project = FormValues & { 
-  _id?: string;
-  technologies: string[] | string;
+type Project = { 
+  _id: string;
+  title: string;
+  description: string;
 };
 
 export default function ManageProjectsPage() {
   const { toast } = useToast();
   const [projects, setProjects] = useState<Project[]>([]);
-  const [personas, setPersonas] = useState<any[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isPhotoSubmitting, setIsPhotoSubmitting] = useState(false);
-  const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(projectSchema),
-    defaultValues: {
-      title: '',
-      description: '',
-      technologies: '',
-      imageUrl: '',
-      links: { website: '', github: '', demo: '' },
-      allowedPersonas: [],
-      stories: [],
-    },
-  });
-
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: 'stories',
-  });
-
-  const fetchProjectsAndPersonas = async () => {
+  const fetchProjects = async () => {
     try {
-      const [resProjects, resPersonas] = await Promise.all([
-        fetch('/api/projects'),
-        fetch('/api/personas')
-      ]);
-      if (!resProjects.ok || !resPersonas.ok) throw new Error('Failed to fetch data');
-      const [dataProjects, dataPersonas] = await Promise.all([
-        resProjects.json(),
-        resPersonas.json()
-      ]);
-      setProjects(dataProjects);
-      setPersonas(dataPersonas);
+      const res = await fetch('/api/projects');
+      if (!res.ok) throw new Error('Failed to fetch data');
+      const data = await res.json();
+      setProjects(data);
     } catch (error) {
       console.error(error);
       toast({
@@ -136,53 +52,14 @@ export default function ManageProjectsPage() {
   };
 
   useEffect(() => {
-    fetchProjectsAndPersonas();
+    fetchProjects();
   }, []);
-
-  const onSubmit = async (values: FormValues) => {
-    setIsSubmitting(true);
-    const method = editingProject ? 'PUT' : 'POST';
-    const url = editingProject ? `/api/projects/${editingProject._id}` : '/api/projects';
-
-    const dataToSend = {
-      ...values,
-      technologies: values.technologies.split(',').map(tech => tech.trim()),
-    };
-
-    try {
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dataToSend),
-      });
-
-      if (!res.ok) throw new Error(`Failed to ${editingProject ? 'update' : 'create'} project`);
-
-      await fetchProjectsAndPersonas();
-      toast({
-        title: `Project ${editingProject ? 'Updated' : 'Created'}!`,
-        description: `${values.title} has been successfully ${editingProject ? 'updated' : 'added'}.`,
-      });
-      setIsDialogOpen(false);
-      setEditingProject(null);
-      form.reset();
-    } catch (error) {
-      console.error(error);
-      toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: `Could not ${editingProject ? 'update' : 'create'} project.`,
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const handleDelete = async (projectId: string) => {
     try {
       const res = await fetch(`/api/projects/${projectId}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete project');
-      await fetchProjectsAndPersonas();
+      await fetchProjects();
       toast({
         title: 'Project Deleted!',
         description: 'The project has been successfully removed.',
@@ -197,287 +74,22 @@ export default function ManageProjectsPage() {
     }
   };
 
-  const onFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setIsPhotoSubmitting(true);
-    const formData = new FormData();
-    formData.append('projectPhoto', file);
-
-    try {
-      const res = await fetch('/api/projects/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to upload image');
-      }
-
-      const { url } = await res.json();
-      
-      // Directly update the form field with the new URL
-      form.setValue('imageUrl', url, { shouldValidate: true });
-      
-      toast({
-        title: 'Photo Uploaded!',
-        description: 'Your project photo has been successfully uploaded.',
-      });
-    } catch (error: any) {
-      console.error(error);
-      toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: error.message || 'Could not upload photo.',
-      });
-    } finally {
-      setIsPhotoSubmitting(false);
-       if(fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
-  };
-  
-  const openEditDialog = (project: Project) => {
-    setEditingProject(project);
-    form.reset({
-        ...project,
-        technologies: Array.isArray(project.technologies) ? project.technologies.join(', ') : project.technologies,
-        imageUrl: project.imageUrl || '',
-        allowedPersonas: project.allowedPersonas || [],
-        stories: project.stories || [],
-    });
-    setIsDialogOpen(true);
-  };
-
-  const openNewDialog = () => {
-    setEditingProject(null);
-    form.reset({
-      title: '',
-      description: '',
-      technologies: '',
-      imageUrl: '',
-      links: { website: '', github: '', demo: '' },
-      allowedPersonas: [],
-      stories: [],
-    });
-    setIsDialogOpen(true);
-  };
-
   return (
     <div className="min-h-screen bg-secondary p-4 sm:p-6 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-foreground">Manage Projects</h1>
           <div className="flex gap-4">
-             <Button onClick={openNewDialog}>
-              <PlusCircle className="mr-2 h-4 w-4" /> Add New Project
+            <Button asChild>
+              <Link href="/admin/projects/new">
+                <PlusCircle className="mr-2 h-4 w-4" /> Add New Project
+              </Link>
             </Button>
             <Button asChild variant="outline">
               <Link href="/admin">Back to Dashboard</Link>
             </Button>
           </div>
         </div>
-
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle>{editingProject ? 'Edit Project' : 'Add New Project'}</DialogTitle>
-            </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-h-[80vh] overflow-y-auto px-2">
-                <FormField control={form.control} name="title" render={({ field }) => ( <FormItem> <FormLabel>Title</FormLabel> <FormControl><Input placeholder="e.g. Awesome Project" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="description" render={({ field }) => ( <FormItem> <FormLabel>Description</FormLabel> <FormControl><Textarea placeholder="Describe your project..." {...field} /></FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="technologies" render={({ field }) => ( <FormItem> <FormLabel>Technologies (comma-separated)</FormLabel> <FormControl><Input placeholder="e.g. React, Node.js, MongoDB" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
-                
-                {/* UPGRADED IMAGE UPLOAD FIELD */}
-                <FormField control={form.control} name="imageUrl" render={({ field }) => ( 
-                  <FormItem> 
-                    <FormLabel>Image URL / Upload</FormLabel> 
-                    <div className="flex gap-2 items-center mt-2">
-                      <FormControl>
-                        <Input placeholder="https://image.png" {...field} className="flex-1" />
-                      </FormControl>
-                      
-                      <FormControl>
-                        <Input 
-                          type="file" 
-                          className="hidden" 
-                          accept="image/*" 
-                          onChange={onFileChange}
-                          ref={fileInputRef}
-                        />
-                      </FormControl>
-                      
-                      <Button 
-                        type="button"
-                        variant="secondary"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={isPhotoSubmitting}
-                      >
-                        {isPhotoSubmitting ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Uploading...
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="mr-2 h-4 w-4" />
-                            Upload Photo
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                    <FormMessage />
-                  </FormItem> 
-                )} />
-
-                <FormField control={form.control} name="links.website" render={({ field }) => ( <FormItem> <FormLabel>Website URL</FormLabel> <FormControl><Input placeholder="https://example.com" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="links.github" render={({ field }) => ( <FormItem> <FormLabel>GitHub URL</FormLabel> <FormControl><Input placeholder="https://github.com/user/repo" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="links.demo" render={({ field }) => ( <FormItem> <FormLabel>Demo URL</FormLabel> <FormControl><Input placeholder="https://youtube.com/watch?v=..." {...field} /></FormControl> <FormMessage /> </FormItem> )} />
-                
-                <FormField control={form.control} name="allowedPersonas" render={() => (
-                  <FormItem>
-                    <div className="mb-4">
-                      <FormLabel className="text-base">Target Personas</FormLabel>
-                      <p className="text-[0.8rem] text-muted-foreground">
-                        Select which personas this project should be visible to. Leave blank to show for everyone.
-                      </p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      {personas.map((persona) => (
-                        <FormField
-                          key={persona._id}
-                          control={form.control}
-                          name="allowedPersonas"
-                          render={({ field }) => {
-                            return (
-                              <FormItem key={persona._id} className="flex flex-row items-start space-x-3 space-y-0">
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(persona._id)}
-                                    onCheckedChange={(checked: boolean | 'indeterminate') => {
-                                      return checked === true
-                                        ? field.onChange([...(field.value || []), persona._id])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (value) => value !== persona._id
-                                            )
-                                          )
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal">
-                                  {persona.name}
-                                </FormLabel>
-                              </FormItem>
-                            )
-                          }}
-                        />
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-
-                {/* STORY BUILDER SECTION */}
-                <div className="space-y-4 pt-4 border-t border-border">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="text-lg font-bold">Story Builder (STAR Method)</h3>
-                      <p className="text-sm text-muted-foreground">Add behavioral stories to this project.</p>
-                    </div>
-                    <Button type="button" variant="outline" onClick={() => append({ theme: 'Problem Solved', situation: '', challenge: '', action: '', result: '', learning: '' })}>
-                      <PlusCircle className="mr-2 h-4 w-4" /> Add Story
-                    </Button>
-                  </div>
-                  
-                  {fields.map((field, index) => (
-                    <Card key={field.id} className="relative">
-                      <CardContent className="pt-6 space-y-4">
-                        <Button 
-                          type="button" 
-                          variant="ghost" 
-                          size="icon" 
-                          className="absolute top-2 right-2 text-destructive"
-                          onClick={() => remove(index)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                        
-                        <FormField control={form.control} name={`stories.${index}.theme`} render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Theme</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select a theme" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {storyThemes.map(theme => (
-                                  <SelectItem key={theme} value={theme}>{theme}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
-                        
-                        <FormField control={form.control} name={`stories.${index}.situation`} render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Situation (Context)</FormLabel>
-                            <FormControl><Textarea placeholder="What was the background context?" {...field} /></FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
-
-                        <FormField control={form.control} name={`stories.${index}.challenge`} render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Challenge (The Obstacle)</FormLabel>
-                            <FormControl><Textarea placeholder="What was the specific challenge or task?" {...field} /></FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
-
-                        <FormField control={form.control} name={`stories.${index}.action`} render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Action (What you did)</FormLabel>
-                            <FormControl><Textarea placeholder="What action did you personally take?" {...field} /></FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
-
-                        <FormField control={form.control} name={`stories.${index}.result`} render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Result (Measurable Outcome)</FormLabel>
-                            <FormControl><Textarea placeholder="What was the measurable outcome?" {...field} /></FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
-
-                        <FormField control={form.control} name={`stories.${index}.learning`} render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Learning (The Takeaway)</FormLabel>
-                            <FormControl><Textarea placeholder="What did you learn from this?" {...field} /></FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
-                        
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-
-                <Button type="submit" disabled={isSubmitting} className="mt-4">
-                  {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</> : 'Save Project'}
-                </Button>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
 
         <div className="bg-card rounded-lg border">
           <Table>
@@ -495,8 +107,10 @@ export default function ManageProjectsPage() {
                     <TableCell className="font-medium">{proj.title}</TableCell>
                     <TableCell className="max-w-xs truncate">{proj.description}</TableCell>
                     <TableCell className="text-right">
-                       <Button variant="ghost" size="icon" onClick={() => openEditDialog(proj)}>
-                        <Edit className="h-4 w-4" />
+                      <Button variant="ghost" size="icon" asChild>
+                        <Link href={`/admin/projects/${proj._id}`}>
+                          <Edit className="h-4 w-4" />
+                        </Link>
                       </Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
@@ -514,7 +128,7 @@ export default function ManageProjectsPage() {
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction
-                              onClick={() => handleDelete(proj._id!)}
+                              onClick={() => handleDelete(proj._id)}
                               className="bg-destructive hover:bg-destructive/90"
                             >
                               Delete

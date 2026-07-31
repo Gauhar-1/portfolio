@@ -4,6 +4,7 @@ import { Github, Linkedin, Loader2, Mail, Twitter, ArrowUp, ShieldCheck, Activit
 import { Button } from './ui/button';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useExactTelemetry } from '@/hooks/useExactTelemetry';
 
 type Links = {
   github?: string;
@@ -20,6 +21,7 @@ const Footer = ({initialLinks}: footerProps) => {
   const currentYear = new Date().getFullYear();
   const [links, setLinks] = useState<Links>(initialLinks);
   const [isLoading, setIsLoading] = useState(true);
+  const { trackClick } = useExactTelemetry();
 
   // --- FETCH LINKS ---
   useEffect(() => {
@@ -105,10 +107,10 @@ const Footer = ({initialLinks}: footerProps) => {
                             <Loader2 className="h-5 w-5 animate-spin text-emerald-500" />
                         ) : (
                             <>
-                                {links.github && <FooterSocial href={links.github} icon={<Github className="w-4 h-4" />} />}
-                                {links.linkedin && <FooterSocial href={links.linkedin} icon={<Linkedin className="w-4 h-4" />} />}
-                                {links.x && <FooterSocial href={links.x} icon={<Twitter className="w-4 h-4" />} />}
-                                {links.email && <FooterSocial href={`mailto:${links.email}`} icon={<Mail className="w-4 h-4" />} />}
+                                {links.github && <FooterSocial href={links.github} icon={<Github className="w-4 h-4" />} label="GitHub" trackClick={trackClick} />}
+                                {links.linkedin && <FooterSocial href={links.linkedin} icon={<Linkedin className="w-4 h-4" />} label="LinkedIn" trackClick={trackClick} />}
+                                {links.x && <FooterSocial href={links.x} icon={<Twitter className="w-4 h-4" />} label="X" trackClick={trackClick} />}
+                                {links.email && <FooterSocial href={`mailto:${links.email}`} icon={<Mail className="w-4 h-4" />} label="Email" trackClick={trackClick} />}
                             </>
                         )}
                     </div>
@@ -150,12 +152,13 @@ const Footer = ({initialLinks}: footerProps) => {
 };
 
 // --- SUB-COMPONENT ---
-const FooterSocial = ({ href, icon }: { href: string, icon: React.ReactNode }) => (
+const FooterSocial = ({ href, icon, label, trackClick }: { href: string, icon: React.ReactNode, label: string, trackClick: (target: string) => void }) => (
     <a 
         href={href} 
         target="_blank" 
         rel="noopener noreferrer"
         className="w-10 h-10 flex items-center justify-center bg-[#0a0a0a] border border-slate-800 hover:border-emerald-500 hover:bg-emerald-500/10 text-slate-400 hover:text-emerald-400 transition-all duration-300"
+        onClick={() => trackClick(label)}
     >
         {icon}
     </a>

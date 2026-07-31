@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import StoryTelemetryObserver from '@/components/story-telemetry-observer';
+import ClientTracker from '@/components/client-tracker';
+import ProjectLinks from '@/components/project-links';
 
 const themeIcons: Record<string, React.ReactNode> = {
   'Problem Solved': <Target className="w-5 h-5" />,
@@ -44,6 +46,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <ClientTracker targetName={`/projects/${id}`} />
       <Header initialLinks={{ github: '', linkedin: '' }} />
       
       <main className="flex-1 w-full max-w-4xl mx-auto px-6 py-24 md:py-32">
@@ -72,28 +75,11 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             {project.description}
           </p>
 
-          <div className="flex gap-4 pt-4">
-            {project.links?.github && (
-              <a 
-                href={project.links.github} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center h-10 px-6 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 font-medium transition-colors"
-              >
-                <Github className="w-4 h-4 mr-2" /> Source Code
-              </a>
-            )}
-            {project.links?.demo && (
-              <a 
-                href={project.links.demo} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center h-10 px-6 rounded-md bg-emerald-500 text-black hover:bg-emerald-600 font-medium transition-colors"
-              >
-                <ExternalLink className="w-4 h-4 mr-2" /> Live Demo
-              </a>
-            )}
-          </div>
+          <ProjectLinks 
+            githubUrl={project.links?.github} 
+            demoUrl={project.links?.demo} 
+            projectTitle={project.title} 
+          />
         </header>
 
         {project.stories && project.stories.length > 0 ? (

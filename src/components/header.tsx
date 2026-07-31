@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { NAV_LINKS } from '@/lib/data';
 import { cn } from '@/lib/utils';
+import { useExactTelemetry } from '@/hooks/useExactTelemetry';
 
 type Links = {
   github?: string;
@@ -28,6 +29,7 @@ const Header = ({ initialLinks }: headerProps) => {
   const [activeSection, setActiveSection] = useState('');
   const [scrolled, setScrolled] = useState(false);
   const [time, setTime] = useState('');
+  const { trackClick } = useExactTelemetry();
 
   // --- 1. MOUNT & CLOCK ---
   useEffect(() => {
@@ -177,10 +179,10 @@ const Header = ({ initialLinks }: headerProps) => {
           ) : (
             <>
               <div className="hidden lg:flex items-center space-x-1 border-r border-white/10 pr-4 mr-2">
-                {links.github && <SocialBtn href={links.github} icon={<Github className="h-4 w-4" />} label="GH" />}
-                {links.linkedin && <SocialBtn href={links.linkedin} icon={<Linkedin className="h-4 w-4" />} label="LI" />}
-                {links.x && <SocialBtn href={links.x} icon={<Twitter className="h-4 w-4" />} label="X" />}
-                {links.email && <SocialBtn href={`mailto:${links.email}`} icon={<Mail className="h-4 w-4" />} label="EM" />}
+                {links.github && <SocialBtn href={links.github} icon={<Github className="h-4 w-4" />} label="GitHub" trackClick={trackClick} />}
+                {links.linkedin && <SocialBtn href={links.linkedin} icon={<Linkedin className="h-4 w-4" />} label="LinkedIn" trackClick={trackClick} />}
+                {links.x && <SocialBtn href={links.x} icon={<Twitter className="h-4 w-4" />} label="X" trackClick={trackClick} />}
+                {links.email && <SocialBtn href={`mailto:${links.email}`} icon={<Mail className="h-4 w-4" />} label="Email" trackClick={trackClick} />}
               </div>
 
               <Button
@@ -189,7 +191,7 @@ const Header = ({ initialLinks }: headerProps) => {
                 asChild
                 className="hidden sm:flex border-emerald-500/30 text-emerald-500 hover:bg-emerald-500 hover:text-black uppercase tracking-widest text-[10px] font-bold h-8 bg-emerald-950/30"
               >
-                <a href={links.resumeUrl || '/MD-Gohar-Khan-Resume.pdf'} target="_blank" rel="noopener noreferrer">
+                <a href={links.resumeUrl || '/MD-Gohar-Khan-Resume.pdf'} target="_blank" rel="noopener noreferrer" onClick={() => trackClick('Resume')}>
                   <Download className="mr-2 h-3 w-3" />
                   GET_INTEL
                 </a>
@@ -231,13 +233,13 @@ const Header = ({ initialLinks }: headerProps) => {
 
                 <div className="mt-auto p-6 border-t border-white/10 bg-black/20">
                   <div className="flex justify-center gap-4">
-                    {links.github && <MobileSocial href={links.github} icon={<Github className="h-5 w-5" />} />}
-                    {links.linkedin && <MobileSocial href={links.linkedin} icon={<Linkedin className="h-5 w-5" />} />}
-                    {links.email && <MobileSocial href={`mailto:${links.email}`} icon={<Mail className="h-5 w-5" />} />}
+                    {links.github && <MobileSocial href={links.github} icon={<Github className="h-5 w-5" />} label="GitHub" trackClick={trackClick} />}
+                    {links.linkedin && <MobileSocial href={links.linkedin} icon={<Linkedin className="h-5 w-5" />} label="LinkedIn" trackClick={trackClick} />}
+                    {links.email && <MobileSocial href={`mailto:${links.email}`} icon={<Mail className="h-5 w-5" />} label="Email" trackClick={trackClick} />}
                   </div>
                   <div className="mt-6 text-center">
                     <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-bold uppercase tracking-widest text-xs" asChild>
-                      <a href={links.resumeUrl || '/resume.pdf'}>Download Resume </a>
+                      <a href={links.resumeUrl || '/resume.pdf'} onClick={() => trackClick('Resume')}>Download Resume</a>
                     </Button>
                   </div>
                 </div>
@@ -251,8 +253,8 @@ const Header = ({ initialLinks }: headerProps) => {
 };
 
 // --- HELPER COMPONENTS ---
-const SocialBtn = ({ href, icon, label }: { href: string, icon: React.ReactNode, label: string }) => (
-  <a href={href} target="_blank" rel="noopener noreferrer" className="group relative p-2">
+const SocialBtn = ({ href, icon, label, trackClick }: { href: string, icon: React.ReactNode, label: string, trackClick: (target: string) => void }) => (
+  <a href={href} target="_blank" rel="noopener noreferrer" className="group relative p-2" onClick={() => trackClick(label)}>
     <div className="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/10 rounded-sm transition-colors"></div>
     <div className="text-slate-400 group-hover:text-emerald-400 transition-colors">
       {icon}
@@ -261,8 +263,8 @@ const SocialBtn = ({ href, icon, label }: { href: string, icon: React.ReactNode,
   </a>
 );
 
-const MobileSocial = ({ href, icon }: { href: string, icon: React.ReactNode }) => (
-  <a href={href} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 text-slate-400 hover:text-emerald-500 hover:border-emerald-500 transition-all rounded-sm">
+const MobileSocial = ({ href, icon, label, trackClick }: { href: string, icon: React.ReactNode, label: string, trackClick: (target: string) => void }) => (
+  <a href={href} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 text-slate-400 hover:text-emerald-500 hover:border-emerald-500 transition-all rounded-sm" onClick={() => trackClick(label)}>
     {icon}
   </a>
 );

@@ -13,6 +13,12 @@ export interface ISession extends Document {
   pageViews: { path: string; duration: number; timestamp: Date }[];
   clickedProjects: Types.ObjectId[];
   storyPings: { storyTheme: string; duration: number; timestamp: Date }[];
+  events: {
+    eventType: 'PAGE_VIEW' | 'OUTBOUND_CLICK' | 'CONTACT_INITIATED';
+    target: string;
+    duration?: number;
+    timestamp: Date;
+  }[];
   startTime: Date;
   lastActiveAt: Date;
 }
@@ -39,6 +45,12 @@ const SessionSchema: Schema<ISession> = new Schema({
   storyPings: [{
     storyTheme: String,
     duration: Number,
+    timestamp: { type: Date, default: Date.now }
+  }],
+  events: [{
+    eventType: { type: String, enum: ['PAGE_VIEW', 'OUTBOUND_CLICK', 'CONTACT_INITIATED'], required: true },
+    target: { type: String, required: true },
+    duration: { type: Number },
     timestamp: { type: Date, default: Date.now }
   }],
   startTime: { type: Date, default: Date.now },

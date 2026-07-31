@@ -17,6 +17,7 @@ import { submitContactForm } from '@/app/actions';
 import { Loader2, Radio, Target, Terminal, Wifi, Activity } from 'lucide-react';
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { useExactTelemetry } from '@/hooks/useExactTelemetry';
 
 const formSchema = z.object({
     name: z.string().min(2, { message: 'IDENTITY_UNCONFIRMED' }),
@@ -41,6 +42,17 @@ const ContactSection = () => {
         resolver: zodResolver(formSchema),
         defaultValues: { name: '', email: '', message: '' },
     });
+
+    const { trackContactInit } = useExactTelemetry();
+    const hasTrackedInitRef = useRef(false);
+
+    const handleFocus = (logMessage: string) => {
+        addLog(logMessage);
+        if (!hasTrackedInitRef.current) {
+            trackContactInit();
+            hasTrackedInitRef.current = true;
+        }
+    };
 
     // --- LOGIC: LOGGING SYSTEM ---
     const addLog = useCallback((msg: string) => {
@@ -232,7 +244,7 @@ const ContactSection = () => {
                                                                 <span className="absolute -top-3 left-0 text-[9px] font-mono text-emerald-700 font-bold bg-[#0F1012] px-1">OPERATIVE_ID</span>
                                                                 <Input
                                                                     {...field}
-                                                                    onFocus={() => addLog("INPUT_DETECTED: NAME_FIELD")}
+                                                                    onFocus={() => handleFocus("INPUT_DETECTED: NAME_FIELD")}
                                                                     className="h-12 bg-[#050505] border-[#222] text-emerald-100 font-mono rounded-none focus:border-emerald-600 focus:ring-0 focus:bg-[#0a0a0a] transition-all uppercase tracking-wider"
                                                                     placeholder="ENTER NAME..."
                                                                 />
@@ -252,7 +264,7 @@ const ContactSection = () => {
                                                                 <span className="absolute -top-3 left-0 text-[9px] font-mono text-emerald-700 font-bold bg-[#0F1012] px-1">COMMS_CHANNEL</span>
                                                                 <Input
                                                                     {...field}
-                                                                    onFocus={() => addLog("INPUT_DETECTED: EMAIL_FIELD")}
+                                                                    onFocus={() => handleFocus("INPUT_DETECTED: EMAIL_FIELD")}
                                                                     className="h-12 bg-[#050505] border-[#222] text-emerald-100 font-mono rounded-none focus:border-emerald-600 focus:ring-0 focus:bg-[#0a0a0a] transition-all tracking-wider"
                                                                     placeholder="ENTER EMAIL..."
                                                                 />
@@ -274,7 +286,7 @@ const ContactSection = () => {
                                                             <span className="absolute -top-3 left-0 text-[9px] font-mono text-emerald-700 font-bold bg-[#0F1012] px-1">INTEL_PACKET</span>
                                                             <Textarea
                                                                 {...field}
-                                                                onFocus={() => addLog("INPUT_DETECTED: MESSAGE_BODY")}
+                                                                onFocus={() => handleFocus("INPUT_DETECTED: MESSAGE_BODY")}
                                                                 onChange={(e) => {
                                                                     field.onChange(e);
                                                                     if (e.target.value.length % 5 === 0) addLog("BUFFERING...");

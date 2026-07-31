@@ -6,21 +6,34 @@ export async function POST(req: Request) {
   await dbConnect();
   try {
     const body = await req.json();
-    const { sessionId, score, action } = body;
+    const { sessionId, event, score, action } = body;
 
-    if (!sessionId || !score || !action) {
-      return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
+    if (!sessionId) {
+      return NextResponse.json({ message: 'Missing sessionId' }, { status: 400 });
+    }
+
+    const updateQuery: any = {
+      $set: { lastActiveAt: new Date() }
+    };
+
+    // Legacy support (optional, can be removed if fully deprecated)
+    if (score && action) {
+      updateQuery.$inc = { intentScore: score };
+      updateQuery.$push = { interactionLog: { action, timestamp: new Date() } };
+    }
+
+    // New Exact Telemetry
+    if (event) {
+      if (!updateQuery.$push) updateQuery.$push = {};
+      updateQuery.$push.events = {
+        ...event,
+        timestamp: new Date()
+      };
     }
 
     const session = await Session.findOneAndUpdate(
       { sessionId },
-      { 
-        $inc: { intentScore: score },
-        $push: { 
-          interactionLog: { action, timestamp: new Date() } 
-        },
-        $set: { lastActiveAt: new Date() }
-      },
+      updateQuery,
       { new: true }
     );
 

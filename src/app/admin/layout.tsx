@@ -11,9 +11,9 @@ export default function AdminLayout({
       <div className="hidden md:block w-72 border-r bg-background">
         <AdminSidebar />
       </div>
-      <div className="flex flex-col flex-1 overflow-hidden">
+      <div className="flex flex-col flex-1">
         <AdminHeader />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">
           {children}
         </main>
       </div>
