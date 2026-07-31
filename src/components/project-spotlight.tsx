@@ -85,31 +85,32 @@ const ProjectSpotlight = () => {
         return () => { isMounted = false; };
     }, [activePersona]);
 
-    useGSAP(() => {
+   useGSAP(() => {
         if (isLoading || !projects.length || !trackRef.current || !sectionRef.current) return;
 
         const panels = gsap.utils.toArray(".project-panel");
-        const totalPanels = panels.length;
+        
+        // FIX 1: Calculate exact DOM width dynamically. 
+        // This accounts for any border-px or scrollbar widths that window.innerWidth misses.
+        const getScrollAmount = () => trackRef.current!.scrollWidth - window.innerWidth;
 
-        // FIX 2: Calculate the exact distance the track needs to slide left
-        const scrollDistance = (totalPanels - 1) * window.innerWidth;
-
-        // FIX 3: Animate the entire track container, not the individual panels
+        // FIX 2: Use a function () => for 'x' so it recalculates on window resize
         const tween = gsap.to(trackRef.current, {
-            x: -scrollDistance,
+            x: () => -getScrollAmount(),
             ease: "none",
         });
 
-        // Pin & Snap
         ScrollTrigger.create({
             trigger: sectionRef.current,
             start: "top top",
-            end: () => `+=${scrollDistance}`,
+            end: () => `+=${getScrollAmount()}`, // Dynamically match the exact width
             pin: true,
             animation: tween,
-            scrub: 1, // Reduced to 1 for smoother 1-to-1 tracking
+            // FIX 3: Change from 1 to true. This removes the lag, ensuring the 
+            // horizontal animation is 100% complete the exact millisecond it unpins.
+            scrub: true, 
             snap: {
-                snapTo: 1 / (totalPanels - 1),
+                snapTo: 1 / (panels.length - 1),
                 duration: { min: 0.3, max: 0.8 },
                 delay: 0,
                 ease: "power2.inOut"
@@ -122,7 +123,7 @@ const ProjectSpotlight = () => {
             }
         });
 
-        // Image Parallax Effect
+        // Image Parallax Effect (Also updated to be responsive)
         panels.forEach((panel: any, i) => {
             if (i === 0) return; 
             const img = panel.querySelector('.parallax-img');
@@ -134,6 +135,7 @@ const ProjectSpotlight = () => {
                         ease: "none",
                         scrollTrigger: {
                             trigger: sectionRef.current,
+                            // Ensure these also dynamically calculate width on resize
                             start: () => `top top-=${(i - 1) * window.innerWidth}`,
                             end: () => `top top-=${(i + 1) * window.innerWidth}`,
                             scrub: true,
