@@ -87,7 +87,7 @@ const Footer = ({initialLinks}: footerProps) => {
                         <div 
                             key={i} 
                             className="w-1 bg-emerald-500/50"
-                            style={{ height: `${Math.random() * 100}%` }}
+                            style={{ height: `${(Math.abs(Math.sin(i * 12.9898)) * 100).toFixed(2)}%` }}
                         ></div>
                     ))}
                 </div>

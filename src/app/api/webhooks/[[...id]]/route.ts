@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const newWebhook = await Webhook.create(body);
-    await logAuditAction({ action: 'CREATE', entityType: 'Webhook', entityId: newWebhook._id as string, changes: body });
+    await logAuditAction({ action: 'CREATE', entityType: 'Webhook', entityId: String(newWebhook._id), changes: body });
     return NextResponse.json(newWebhook, { status: 201 });
   } catch (error) {
     console.error(error);
@@ -52,7 +52,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id?: string[
     if (!updatedWebhook) {
       return NextResponse.json({ message: 'Webhook not found' }, { status: 404 });
     }
-    await logAuditAction({ action: 'UPDATE', entityType: 'Webhook', entityId: updatedWebhook._id as string, changes: body });
+    await logAuditAction({ action: 'UPDATE', entityType: 'Webhook', entityId: String(updatedWebhook._id), changes: body });
     return NextResponse.json(updatedWebhook, { status: 200 });
   } catch (error) {
     console.error(error);

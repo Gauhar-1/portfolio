@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
         // Create session
         const session = await getSession();
-        session.userId = user._id as string;
+        session.userId = String(user._id);
         session.isLoggedIn = true;
         await session.save();
 

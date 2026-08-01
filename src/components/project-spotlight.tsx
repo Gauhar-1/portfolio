@@ -281,7 +281,7 @@ const ProjectSpotlight = () => {
                                             <span className="font-mono text-xs text-red-500 font-bold tracking-widest bg-black/50 px-2 py-1 backdrop-blur-sm">REC</span>
                                         </div>
                                         <div className="absolute bottom-6 right-6 font-mono text-[10px] text-slate-500 tracking-[0.3em] pointer-events-none">
-                                            COORD: {Math.floor(Math.random() * 90)}°N {Math.floor(Math.random() * 180)}°W
+                                            COORD: {Math.floor(Math.abs(Math.sin(index * 12.9898)) * 90)}°N {Math.floor(Math.abs(Math.sin(index * 78.233)) * 180)}°W
                                         </div>
                                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 pointer-events-none opacity-0 group-hover/img:opacity-100 transition-opacity duration-300">
                                             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[2px] h-4 bg-emerald-500"></div>

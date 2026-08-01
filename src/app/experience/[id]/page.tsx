@@ -2,14 +2,14 @@ import dbConnect from '@/lib/mongodb';
 import Experience from '@/models/Experience';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, ExternalLink, Target, AlertCircle, Handshake, Zap, Trophy } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, Target, AlertCircle, Handshake, Zap, Trophy, Briefcase, ChevronRight, Calendar, Building2 } from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import StoryTelemetryObserver from '@/components/story-telemetry-observer';
 import ClientTracker from '@/components/client-tracker';
 import ExperienceLinks from '@/components/experience-links';
 
+// Adapted for the dark brutalist theme
 const themeIcons: Record<string, React.ReactNode> = {
   'Problem Solved': <Target className="w-5 h-5" />,
   'Mistake Made': <AlertCircle className="w-5 h-5" />,
@@ -19,11 +19,11 @@ const themeIcons: Record<string, React.ReactNode> = {
 };
 
 const themeColors: Record<string, string> = {
-  'Problem Solved': 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-  'Mistake Made': 'bg-red-500/10 text-red-500 border-red-500/20',
-  'Conflict Resolved': 'bg-purple-500/10 text-purple-500 border-purple-500/20',
-  'Influenced Decision': 'bg-amber-500/10 text-amber-500 border-amber-500/20',
-  'Proudest Build': 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+  'Problem Solved': 'text-cyan-400 border-cyan-400/30 bg-cyan-400/5',
+  'Mistake Made': 'text-red-500 border-red-500/30 bg-red-500/5',
+  'Conflict Resolved': 'text-purple-400 border-purple-400/30 bg-purple-400/5',
+  'Influenced Decision': 'text-amber-400 border-amber-400/30 bg-amber-400/5',
+  'Proudest Build': 'text-blue-500 border-blue-500/30 bg-blue-500/5',
 };
 
 export default async function ExperienceDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -37,116 +37,164 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
     notFound();
   }
 
-  // Safely serialize for Client Components if needed
   const serializedExperience = {
     ...experience,
     _id: experience._id.toString(),
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-[#0a0a0a] text-slate-200 selection:bg-blue-500/30 font-sans relative flex flex-col overflow-x-hidden">
+      {/* Background Textures matching the Experience Section */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.15] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')] z-0"></div>
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] h-[70vw] bg-blue-900/10 rounded-full blur-[120px] pointer-events-none z-0"></div>
+
       <ClientTracker targetName={`/experience/${id}`} />
-      <Header initialLinks={{ github: '', linkedin: '' }} />
+      <div className="relative z-50">
+        <Header initialLinks={{ github: '', linkedin: '' }} />
+      </div>
       
-      <main className="flex-1 w-full max-w-4xl mx-auto px-6 py-24 md:py-32">
+      <main className="flex-1 w-full max-w-5xl mx-auto px-4 md:px-8 py-12 md:py-24 relative z-10">
+        
+        {/* Navigation */}
         <Link 
           href="/overview" 
-          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-12 group"
+          className="inline-flex items-center font-mono text-xs md:text-sm font-bold text-slate-500 uppercase tracking-widest hover:text-blue-500 transition-colors mb-12 group"
         >
-          <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-          Back to Overview
+          <ArrowLeft className="w-4 h-4 mr-3 group-hover:-translate-x-2 transition-transform" />
+          Close_File
         </Link>
         
-        <header className="space-y-6 mb-16">
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-blue-500">
-              {experience.title}
-            </h1>
-            <h2 className="text-2xl md:text-3xl font-medium text-foreground/80">
-              {experience.company}
-            </h2>
-            <p className="text-lg text-muted-foreground font-medium">
-              {experience.date}
-            </p>
+        {/* Hero Section */}
+        <header className="relative mb-20">
+          <div className="inline-flex items-center gap-3 border-2 border-blue-600/50 text-blue-500 font-mono text-[10px] md:text-sm tracking-widest px-3 py-1 bg-blue-600/10 mb-8 cursor-default">
+            <Building2 className="w-4 h-4" />
+            DOSSIER // {serializedExperience._id.slice(-6).toUpperCase()}
           </div>
           
-          <div className="flex flex-wrap gap-2 pt-2">
+          <div className="space-y-4 mb-8">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white uppercase leading-[0.9] tracking-tighter break-words">
+              {experience.title}
+            </h1>
+            <h2 className="text-2xl md:text-4xl font-bold text-blue-500 uppercase tracking-tight">
+              @ {experience.company}
+            </h2>
+            <div className="flex items-center gap-2 font-mono text-slate-400 text-sm md:text-base tracking-widest uppercase border-b border-white/10 pb-4 inline-flex">
+              <Calendar className="w-4 h-4" /> {experience.date}
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap gap-2 mb-10">
             {experience.technologies.map((tech: string) => (
-              <Badge key={tech} variant="secondary" className="bg-secondary/50 text-sm py-1 px-3">
+              <span key={tech} className="border border-white/10 px-3 py-1.5 font-mono text-xs font-bold text-slate-300 uppercase hover:border-blue-500 hover:text-blue-500 transition-all bg-black/50 backdrop-blur-sm">
                 {tech}
-              </Badge>
+              </span>
             ))}
           </div>
 
-          <p className="text-xl md:text-2xl text-muted-foreground font-light leading-relaxed max-w-3xl">
+          <div className="font-mono text-slate-400 text-sm md:text-base leading-relaxed whitespace-pre-wrap max-w-3xl border-l-4 border-blue-500/50 pl-6 py-2 bg-gradient-to-r from-blue-500/5 to-transparent">
+            <span className="text-blue-500 font-bold mr-2 tracking-widest uppercase text-xs">CAREER_SUMMARY:</span>
             {experience.description}
-          </p>
+          </div>
 
-          <ExperienceLinks 
-            websiteUrl={experience.links?.website} 
-            companyName={experience.company} 
-          />
+          <div className="mt-12 inline-block">
+            <ExperienceLinks 
+              websiteUrl={experience.links?.website} 
+              companyName={experience.company} 
+            />
+          </div>
         </header>
 
-        {experience.stories && experience.stories.length > 0 ? (
-          <div className="space-y-16">
-            <h2 className="text-2xl font-bold border-b border-border pb-4">The Narrative</h2>
-            
-            {experience.stories.map((story: any, index: number) => (
-              <StoryTelemetryObserver key={index} storyTheme={story.theme} pageType="Experience" pageId={serializedExperience._id}>
-                <div className="relative pl-6 md:pl-10 border-l border-border space-y-8 pb-12 last:pb-0 last:border-transparent">
-                  <div className="absolute -left-3 top-0 bg-background border border-border rounded-full p-1 shadow-sm">
-                    <div className="text-muted-foreground">
-                      {themeIcons[story.theme] || <Target className="w-5 h-5" />}
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Badge variant="outline" className={`mb-4 px-3 py-1 text-sm font-semibold border ${themeColors[story.theme] || 'bg-secondary text-foreground'}`}>
-                      {story.theme}
-                    </Badge>
-                    
-                    <div className="space-y-8 mt-6">
-                      <div>
-                        <h4 className="text-sm font-bold text-foreground/70 uppercase tracking-widest mb-3">Situation</h4>
-                        <p className="text-lg text-muted-foreground leading-relaxed">{story.situation}</p>
-                      </div>
+        {/* The Narrative (STAR Stories) */}
+        <div className="relative">
+          <div className="flex items-center gap-4 mb-16 border-b-2 border-white/10 pb-6">
+            <Briefcase className="w-6 h-6 text-blue-500" />
+            <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-widest">
+              Milestone_Logs
+            </h2>
+          </div>
+
+          {experience.stories && experience.stories.length > 0 ? (
+            <div className="space-y-0 relative before:absolute before:inset-0 before:ml-[15px] md:before:ml-[19px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent">
+              
+              {experience.stories.map((story: any, index: number) => {
+                const themeClass = themeColors[story.theme] || 'text-slate-400 border-slate-400/30 bg-slate-400/5';
+                
+                return (
+                  <StoryTelemetryObserver key={index} storyTheme={story.theme} pageType="Experience" pageId={serializedExperience._id}>
+                    <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active py-8 md:py-16">
                       
-                      <div>
-                        <h4 className="text-sm font-bold text-foreground/70 uppercase tracking-widest mb-3">Challenge</h4>
-                        <p className="text-lg text-muted-foreground leading-relaxed">{story.challenge}</p>
+                      {/* Timeline Node */}
+                      <div className="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-none border-2 border-white/20 bg-[#050505] text-white/50 group-hover:border-blue-500 group-hover:text-blue-500 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-[0_0_15px_rgba(0,0,0,1)] transition-colors z-10 relative">
+                        {themeIcons[story.theme] || <Target className="w-4 h-4" />}
                       </div>
 
-                      <div className="bg-card p-6 md:p-8 rounded-2xl border border-border shadow-sm">
-                        <h4 className="text-sm font-bold text-foreground/70 uppercase tracking-widest mb-4">Action</h4>
-                        <p className="text-lg text-foreground leading-relaxed">{story.action}</p>
-                      </div>
+                      {/* Content Card */}
+                      <div className="w-[calc(100%-3rem)] md:w-[calc(50%-2.5rem)] border-2 border-white/10 bg-[#0f0f11]/80 backdrop-blur-sm p-6 md:p-8 hover:border-white/30 transition-colors shadow-[8px_8px_0_0_rgba(255,255,255,0.02)] hover:shadow-[8px_8px_0_0_rgba(59,130,246,0.1)]">
+                        
+                        <div className={`inline-flex items-center font-mono text-[10px] md:text-xs font-bold uppercase tracking-widest px-2 py-1 mb-6 border ${themeClass}`}>
+                          {story.theme}
+                        </div>
+                        
+                        <div className="space-y-8">
+                          {/* Situation & Challenge */}
+                          <div className="grid grid-cols-1 gap-6">
+                            <div>
+                              <h4 className="text-[10px] md:text-xs font-bold text-white/40 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <ChevronRight className="w-3 h-3 text-blue-500" /> SITUATION
+                              </h4>
+                              <p className="text-sm md:text-base text-slate-300 leading-relaxed font-light">{story.situation}</p>
+                            </div>
+                            <div>
+                              <h4 className="text-[10px] md:text-xs font-bold text-white/40 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <ChevronRight className="w-3 h-3 text-red-500" /> CHALLENGE
+                              </h4>
+                              <p className="text-sm md:text-base text-slate-300 leading-relaxed font-light">{story.challenge}</p>
+                            </div>
+                          </div>
 
-                      <div>
-                        <h4 className="text-sm font-bold text-foreground/70 uppercase tracking-widest mb-3">Result</h4>
-                        <p className="text-lg text-blue-500/90 font-medium leading-relaxed">{story.result}</p>
-                      </div>
+                          {/* Action (Highlighted) */}
+                          <div className="bg-white/[0.02] border-l-2 border-blue-500 p-4 md:p-6 relative">
+                            <h4 className="text-[10px] md:text-xs font-bold text-blue-500 uppercase tracking-widest mb-3">ACTION_TAKEN</h4>
+                            <p className="text-sm md:text-base text-white leading-relaxed">{story.action}</p>
+                          </div>
 
-                      <div className="pt-6 border-t border-border/50">
-                        <h4 className="text-sm font-bold text-foreground/70 uppercase tracking-widest mb-3">The Takeaway</h4>
-                        <p className="text-xl text-foreground font-serif italic border-l-4 border-blue-500/50 pl-6 py-2 leading-relaxed">
-                          "{story.learning}"
-                        </p>
+                          {/* Result */}
+                          <div>
+                            <h4 className="text-[10px] md:text-xs font-bold text-white/40 uppercase tracking-widest mb-2 flex items-center gap-2">
+                              <ChevronRight className="w-3 h-3 text-cyan-500" /> MEASURABLE_RESULT
+                            </h4>
+                            <p className="text-base md:text-lg text-blue-400 font-mono tracking-tight leading-relaxed">
+                              {story.result}
+                            </p>
+                          </div>
+
+                          {/* Learning */}
+                          <div className="pt-6 border-t border-white/10">
+                            <h4 className="text-[10px] md:text-xs font-bold text-white/40 uppercase tracking-widest mb-3">SYSTEM_TAKEAWAY</h4>
+                            <p className="text-sm md:text-base text-slate-400 font-mono italic">
+                              "{story.learning}"
+                            </p>
+                          </div>
+                        </div>
+
                       </div>
                     </div>
-                  </div>
-                </div>
-              </StoryTelemetryObserver>
-            ))}
-          </div>
-        ) : (
-          <div className="py-12 border-t border-border mt-12">
-            <p className="text-muted-foreground italic text-center">No deep-dive narrative available for this experience yet.</p>
-          </div>
-        )}
+                  </StoryTelemetryObserver>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="py-20 border-2 border-white/5 bg-white/[0.01] flex flex-col items-center justify-center text-center">
+              <Briefcase className="w-8 h-8 text-white/20 mb-4" />
+              <p className="font-mono text-sm text-white/40 uppercase tracking-widest">No milestone logs found for this dossier.</p>
+            </div>
+          )}
+        </div>
       </main>
 
-      <Footer initialLinks={{ github: '', linkedin: '' }} />
+      <div className="relative z-50 mt-auto">
+        <Footer initialLinks={{ github: '', linkedin: '' }} />
+      </div>
     </div>
   );
 }

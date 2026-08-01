@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const newChangelog = await Changelog.create(body);
-    await logAuditAction({ action: 'CREATE', entityType: 'Changelog', entityId: newChangelog._id as string, changes: body });
+    await logAuditAction({ action: 'CREATE', entityType: 'Changelog', entityId: String(newChangelog._id), changes: body });
     return NextResponse.json(newChangelog, { status: 201 });
   } catch (error) {
     console.error(error);
@@ -52,7 +52,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id?: string[
     if (!updatedChangelog) {
       return NextResponse.json({ message: 'Changelog not found' }, { status: 404 });
     }
-    await logAuditAction({ action: 'UPDATE', entityType: 'Changelog', entityId: updatedChangelog._id as string, changes: body });
+    await logAuditAction({ action: 'UPDATE', entityType: 'Changelog', entityId: String(updatedChangelog._id), changes: body });
     return NextResponse.json(updatedChangelog, { status: 200 });
   } catch (error) {
     console.error(error);

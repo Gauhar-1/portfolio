@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const newExperience = await Experience.create(body);
-    await logAuditAction({ action: 'CREATE', entityType: 'Experience', entityId: newExperience._id as string, changes: body });
+    await logAuditAction({ action: 'CREATE', entityType: 'Experience', entityId: String(newExperience._id), changes: body });
     return NextResponse.json(newExperience, { status: 201 });
   } catch (error) {
     console.error(error);
@@ -46,7 +46,7 @@ export async function PUT(req: NextRequest) {
     if (!updatedExperience) {
       return NextResponse.json({ message: 'Experience not found' }, { status: 404 });
     }
-    await logAuditAction({ action: 'UPDATE', entityType: 'Experience', entityId: updatedExperience._id as string, changes: body });
+    await logAuditAction({ action: 'UPDATE', entityType: 'Experience', entityId: String(updatedExperience._id), changes: body });
     return NextResponse.json(updatedExperience, { status: 200 });
   } catch (error) {
     console.error(error);

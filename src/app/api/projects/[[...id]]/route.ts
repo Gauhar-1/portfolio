@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const newProject = await Project.create(body);
-    await logAuditAction({ action: 'CREATE', entityType: 'Project', entityId: newProject._id as string, changes: body });
+    await logAuditAction({ action: 'CREATE', entityType: 'Project', entityId: String(newProject._id), changes: body });
     return NextResponse.json(newProject, { status: 201 });
   } catch (error) {
     console.error(error);
@@ -46,7 +46,7 @@ export async function PUT(req: NextRequest) {
     if (!updatedProject) {
       return NextResponse.json({ message: 'Project not found' }, { status: 404 });
     }
-    await logAuditAction({ action: 'UPDATE', entityType: 'Project', entityId: updatedProject._id as string, changes: body });
+    await logAuditAction({ action: 'UPDATE', entityType: 'Project', entityId: String(updatedProject._id), changes: body });
     return NextResponse.json(updatedProject, { status: 200 });
   } catch (error) {
     console.error(error);

@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const newPersona = await Persona.create(body);
-    await logAuditAction({ action: 'CREATE', entityType: 'Persona', entityId: newPersona._id as string, changes: body });
+    await logAuditAction({ action: 'CREATE', entityType: 'Persona', entityId: String(newPersona._id), changes: body });
     return NextResponse.json(newPersona, { status: 201 });
   } catch (error) {
     console.error(error);
@@ -54,7 +54,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id?: string[
     if (!updatedPersona) {
       return NextResponse.json({ message: 'Persona not found' }, { status: 404 });
     }
-    await logAuditAction({ action: 'UPDATE', entityType: 'Persona', entityId: updatedPersona._id as string, changes: body });
+    await logAuditAction({ action: 'UPDATE', entityType: 'Persona', entityId: String(updatedPersona._id), changes: body });
     return NextResponse.json(updatedPersona, { status: 200 });
   } catch (error) {
     console.error(error);
