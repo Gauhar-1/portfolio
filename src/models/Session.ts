@@ -14,7 +14,7 @@ export interface ISession extends Document {
   clickedProjects: Types.ObjectId[];
   storyPings: { storyTheme: string; duration: number; timestamp: Date }[];
   events: {
-    eventType: 'PAGE_VIEW' | 'OUTBOUND_CLICK' | 'CONTACT_INITIATED';
+    eventType: 'PAGE_VIEW' | 'OUTBOUND_CLICK' | 'CONTACT_INITIATED' | 'VIEW_DIAGRAM' | 'READ_TRADEOFFS' | 'COPY_DX_COMMANDS' | 'PLAY_VIDEO' | 'CLICK_GITHUB' | 'CLICK_DEMO' | 'SECTION_DWELL';
     target: string;
     duration?: number;
     timestamp: Date;
@@ -48,7 +48,7 @@ const SessionSchema: Schema<ISession> = new Schema({
     timestamp: { type: Date, default: Date.now }
   }],
   events: [{
-    eventType: { type: String, enum: ['PAGE_VIEW', 'OUTBOUND_CLICK', 'CONTACT_INITIATED'], required: true },
+    eventType: { type: String, enum: ['PAGE_VIEW', 'OUTBOUND_CLICK', 'CONTACT_INITIATED', 'VIEW_DIAGRAM', 'READ_TRADEOFFS', 'COPY_DX_COMMANDS', 'PLAY_VIDEO', 'CLICK_GITHUB', 'CLICK_DEMO', 'SECTION_DWELL'], required: true },
     target: { type: String, required: true },
     duration: { type: Number },
     timestamp: { type: Date, default: Date.now }

@@ -10,46 +10,44 @@ export default function EditProjectPage() {
   const router = useRouter();
   const { id } = useParams() as { id: string };
   const { toast } = useToast();
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [personas, setPersonas] = useState<any[]>([]);
   const [defaultValues, setDefaultValues] = useState<Partial<ProjectFormValues> | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [projRes, personasRes] = await Promise.all([
-          fetch(`/api/projects`),
-          fetch('/api/personas')
-        ]);
-        
-        if (!projRes.ok || !personasRes.ok) throw new Error('Failed to fetch data');
-        
+        const projRes = await fetch('/api/projects');
+
+        if (!projRes.ok) throw new Error('Failed to fetch data');
+
         const projects = await projRes.json();
-        const personasData = await personasRes.json();
-        
         const projData = projects.find((p: any) => p._id === id);
-        
+
         if (!projData) {
           toast({ variant: 'destructive', title: 'Not found' });
           router.push('/admin/projects');
           return;
         }
 
-        setPersonas(personasData);
         setDefaultValues({
           title: projData.title || '',
-          description: projData.description || '',
+          tagline: projData.tagline || '',
+          overview: projData.overview || '',
           technologies: Array.isArray(projData.technologies) ? projData.technologies.join(', ') : projData.technologies || '',
           imageUrl: projData.imageUrl || '',
+          diagramUrl: projData.diagramUrl || '',
+          videoUrl: projData.videoUrl || '',
           links: {
             website: projData.links?.website || '',
             github: projData.links?.github || '',
             demo: projData.links?.demo || '',
           },
-          allowedPersonas: projData.allowedPersonas || [],
-          stories: projData.stories || [],
+          impactMetrics: projData.impactMetrics || [],
+          systemFeatures: projData.systemFeatures || [],
+          architecturalChallenges: projData.architecturalChallenges || [],
+          dxSnippet: projData.dxSnippet || '',
         });
       } catch (error) {
         console.error(error);
@@ -63,10 +61,10 @@ export default function EditProjectPage() {
 
   const handleSubmit = async (values: ProjectFormValues) => {
     setIsSubmitting(true);
-    
+
     const dataToSend = {
       ...values,
-      technologies: values.technologies.split(',').map(tech => tech.trim()),
+      technologies: values.technologies.split(',').map(tech => tech.trim()).filter(Boolean),
     };
 
     try {
@@ -82,7 +80,7 @@ export default function EditProjectPage() {
         title: 'Project Updated!',
         description: `${values.title} has been successfully updated.`,
       });
-      
+
       router.push('/admin/projects');
     } catch (error) {
       console.error(error);
@@ -105,12 +103,11 @@ export default function EditProjectPage() {
   }
 
   return (
-    <ProjectForm 
+    <ProjectForm
       title={`Edit: ${defaultValues.title}`}
       defaultValues={defaultValues as ProjectFormValues}
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
-      personas={personas}
     />
   );
 }

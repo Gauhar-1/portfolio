@@ -2,6 +2,28 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Project from '@/models/Project';
 import { logAuditAction } from '@/lib/audit';
+import { v2 as cloudinary } from 'cloudinary';
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+/**
+ * Extracts the Cloudinary public_id from a secure_url.
+ */
+function extractPublicId(url: string): string | null {
+  if (!url || !url.includes('res.cloudinary.com')) return null;
+  try {
+    const parts = url.split('/upload/');
+    if (parts.length < 2) return null;
+    const afterUpload = parts[1].replace(/^v\d+\//, '');
+    return afterUpload.replace(/\.[^/.]+$/, '') || null;
+  } catch {
+    return null;
+  }
+}
 
 // GET all projects
 export async function GET() {
@@ -54,7 +76,7 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-// DELETE a project
+// DELETE a project — also cleans up Cloudinary images
 export async function DELETE(req: NextRequest) {
   await dbConnect();
   const id = req.url.split('/').pop();
@@ -64,10 +86,26 @@ export async function DELETE(req: NextRequest) {
   }
 
   try {
-    const deletedProject = await Project.findByIdAndDelete(id);
-    if (!deletedProject) {
+    const project = await Project.findById(id);
+    if (!project) {
       return NextResponse.json({ message: 'Project not found' }, { status: 404 });
     }
+
+    // Clean up Cloudinary images before deleting the document
+    const imageUrls = [project.imageUrl, project.diagramUrl].filter(Boolean) as string[];
+    const deletePromises = imageUrls.map((url) => {
+      const publicId = extractPublicId(url);
+      if (publicId) {
+        return cloudinary.uploader.destroy(publicId, { resource_type: 'image' }).catch((err: unknown) => {
+          console.error(`Failed to delete Cloudinary image ${publicId}:`, err);
+        });
+      }
+      return Promise.resolve();
+    });
+
+    await Promise.all(deletePromises);
+
+    await Project.findByIdAndDelete(id);
     await logAuditAction({ action: 'DELETE', entityType: 'Project', entityId: id });
     return NextResponse.json({ message: 'Project deleted' }, { status: 200 });
   } catch (error) {
