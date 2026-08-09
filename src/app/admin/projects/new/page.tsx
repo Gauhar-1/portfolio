@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import ProjectForm, { ProjectFormValues } from '@/components/admin/ProjectForm';
 
@@ -9,21 +9,13 @@ export default function NewProjectPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [personas, setPersonas] = useState<any[]>([]);
-
-  useEffect(() => {
-    fetch('/api/personas')
-      .then(res => res.json())
-      .then(data => setPersonas(data))
-      .catch(console.error);
-  }, []);
 
   const handleSubmit = async (values: ProjectFormValues) => {
     setIsSubmitting(true);
-    
+
     const dataToSend = {
       ...values,
-      technologies: values.technologies.split(',').map(tech => tech.trim()),
+      technologies: values.technologies.split(',').map(tech => tech.trim()).filter(Boolean),
     };
 
     try {
@@ -39,7 +31,7 @@ export default function NewProjectPage() {
         title: 'Project Created!',
         description: `${values.title} has been successfully added.`,
       });
-      
+
       router.push('/admin/projects');
     } catch (error) {
       console.error(error);
@@ -54,11 +46,10 @@ export default function NewProjectPage() {
   };
 
   return (
-    <ProjectForm 
+    <ProjectForm
       title="Add New Project"
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
-      personas={personas}
     />
   );
 }

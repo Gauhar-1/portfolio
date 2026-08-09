@@ -1,41 +1,68 @@
 import mongoose, { Schema, Document, models, Model } from 'mongoose';
 
-export interface IStory {
-  theme: 'Problem Solved' | 'Mistake Made' | 'Conflict Resolved' | 'Influenced Decision' | 'Proudest Build';
-  situation: string;
-  challenge: string;
-  action: string;
-  result: string;
-  learning: string;
+// --- Sub-document interfaces ---
+
+export interface IImpactMetric {
+  label: string;
+  value: string;
+  context: string;
 }
+
+export interface ISystemFeature {
+  featureTitle: string;
+  description: string;
+}
+
+export interface IArchitecturalChallenge {
+  theme: string;
+  bottleneck: string;
+  solution: string;
+  tradeoff: string;
+}
+
+// --- Main document interface ---
 
 export interface IProject extends Document {
   title: string;
   slug: string;
-  description: string;
+  tagline: string;
+  overview: string;
   technologies: string[];
-  imageUrl?: string;
+  imageUrl: string;
+  diagramUrl?: string;
+  videoUrl?: string;
   links?: {
     website?: string;
     github?: string;
     demo?: string;
   };
-  allowedPersonas?: mongoose.Types.ObjectId[];
-  stories?: IStory[];
+  impactMetrics: IImpactMetric[];
+  systemFeatures: ISystemFeature[];
+  architecturalChallenges: IArchitecturalChallenge[];
+  dxSnippet?: string;
 }
 
-const StorySchema = new Schema<IStory>({
-  theme: {
-    type: String,
-    enum: ['Problem Solved', 'Mistake Made', 'Conflict Resolved', 'Influenced Decision', 'Proudest Build'],
-    required: true,
-  },
-  situation: { type: String, required: true },
-  challenge: { type: String, required: true },
-  action: { type: String, required: true },
-  result: { type: String, required: true },
-  learning: { type: String, required: true },
+// --- Sub-document schemas ---
+
+const ImpactMetricSchema = new Schema<IImpactMetric>({
+  label: { type: String, required: true },
+  value: { type: String, required: true },
+  context: { type: String, required: true },
 });
+
+const SystemFeatureSchema = new Schema<ISystemFeature>({
+  featureTitle: { type: String, required: true },
+  description: { type: String, required: true },
+});
+
+const ArchitecturalChallengeSchema = new Schema<IArchitecturalChallenge>({
+  theme: { type: String, required: true },
+  bottleneck: { type: String, required: true },
+  solution: { type: String, required: true },
+  tradeoff: { type: String, required: true },
+});
+
+// --- Main schema ---
 
 const ProjectSchema: Schema<IProject> = new Schema({
   title: {
@@ -46,9 +73,13 @@ const ProjectSchema: Schema<IProject> = new Schema({
     type: String,
     unique: true,
   },
-  description: {
+  tagline: {
     type: String,
-    required: [true, 'Please provide a description.'],
+    required: [true, 'Please provide a tagline.'],
+  },
+  overview: {
+    type: String,
+    required: [true, 'Please provide an overview.'],
   },
   technologies: {
     type: [String],
@@ -56,14 +87,25 @@ const ProjectSchema: Schema<IProject> = new Schema({
   },
   imageUrl: {
     type: String,
+    required: [true, 'A cover image URL is required.'],
+  },
+  diagramUrl: {
+    type: String,
+  },
+  videoUrl: {
+    type: String,
   },
   links: {
     website: String,
     github: String,
     demo: String,
   },
-  allowedPersonas: [{ type: Schema.Types.ObjectId, ref: 'Persona' }],
-  stories: [StorySchema],
+  impactMetrics: [ImpactMetricSchema],
+  systemFeatures: [SystemFeatureSchema],
+  architecturalChallenges: [ArchitecturalChallengeSchema],
+  dxSnippet: {
+    type: String,
+  },
 });
 
 ProjectSchema.pre('save', function (next) {

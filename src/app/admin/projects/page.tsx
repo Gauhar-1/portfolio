@@ -28,7 +28,7 @@ import {
 type Project = { 
   _id: string;
   title: string;
-  description: string;
+  tagline: string;
 };
 
 export default function ManageProjectsPage() {
@@ -96,7 +96,7 @@ export default function ManageProjectsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Title</TableHead>
-                <TableHead>Description</TableHead>
+                <TableHead>Tagline</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -105,7 +105,7 @@ export default function ManageProjectsPage() {
                 projects.map((proj) => (
                   <TableRow key={proj._id}>
                     <TableCell className="font-medium">{proj.title}</TableCell>
-                    <TableCell className="max-w-xs truncate">{proj.description}</TableCell>
+                    <TableCell className="max-w-xs truncate">{proj.tagline}</TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon" asChild>
                         <Link href={`/admin/projects/${proj._id}`}>
