@@ -12,6 +12,8 @@ import Footer from '@/components/footer';
 import StoryTelemetryObserver from '@/components/story-telemetry-observer';
 import ClientTracker from '@/components/client-tracker';
 import ProjectIntentObserver from '@/components/project-intent-observer';
+import ProjectLinks from '@/components/project-links';
+import CopyDxButton from '@/components/copy-dx-button';
 
 // Adapted for the dark brutalist theme
 const themeIcons: Record<string, React.ReactNode> = {
@@ -321,19 +323,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             <div className="bg-[#0d1117] border border-slate-700 rounded-lg overflow-hidden shadow-2xl relative">
               <div className="h-10 bg-[#161b22] border-b border-slate-700 flex items-center justify-between px-4">
                 <div className="font-mono text-xs text-slate-400">~/projects/{project.slug}</div>
-                <ProjectIntentObserver projectId={serializedProject._id} eventType="COPY_DX_COMMANDS" weight={20} triggerOn="click">
-                  <button 
-                    className="flex items-center gap-2 text-xs font-mono text-emerald-500 hover:text-emerald-400 hover:bg-emerald-500/10 px-2 py-1 transition-colors rounded"
-                    onClick={() => {
-                      // Note: navigator.clipboard requires HTTPS or localhost
-                      if (typeof navigator !== 'undefined') {
-                        navigator.clipboard.writeText(project.dxSnippet as string);
-                      }
-                    }}
-                  >
-                    <Copy className="w-3 h-3" /> COPY
-                  </button>
-                </ProjectIntentObserver>
+                <CopyDxButton projectId={serializedProject._id} snippet={project.dxSnippet as string} />
               </div>
               <div className="p-6 overflow-x-auto">
                 <pre className="font-mono text-sm leading-relaxed text-slate-300">
