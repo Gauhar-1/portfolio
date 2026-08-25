@@ -9,18 +9,28 @@ export interface IStory {
   learning: string;
 }
 
+export interface ICaseStudy {
+  businessProblem: string;
+  roleAndScope: string;
+  architectureDetails: string;
+  hardestChallenge: string;
+  outcomes: string[];
+}
+
 export interface IExperience extends Document {
   title: string;
   slug: string;
   company: string;
+  employmentType: 'Freelance' | 'Contract' | 'Full-Time' | 'Part-Time';
   date: string;
   description: string;
+  keyMetric: string;
   technologies: string[];
   links?: {
     website?: string;
     github?: string;
   };
-  allowedPersonas?: mongoose.Types.ObjectId[];
+  caseStudy?: ICaseStudy;
   stories?: IStory[];
 }
 
@@ -50,6 +60,11 @@ const ExperienceSchema: Schema<IExperience> = new Schema({
     type: String,
     required: [true, 'Please provide a company name.'],
   },
+  employmentType: {
+    type: String,
+    enum: ['Freelance', 'Contract', 'Full-Time', 'Part-Time'],
+    default: 'Freelance',
+  },
   date: {
     type: String,
     required: [true, 'Please provide a date range.'],
@@ -58,6 +73,7 @@ const ExperienceSchema: Schema<IExperience> = new Schema({
     type: String,
     required: [true, 'Please provide a description.'],
   },
+  keyMetric: { type: String, default: '' },
   technologies: {
     type: [String],
     required: true,
@@ -66,7 +82,13 @@ const ExperienceSchema: Schema<IExperience> = new Schema({
     website: String,
     github: String,
   },
-  allowedPersonas: [{ type: Schema.Types.ObjectId, ref: 'Persona' }],
+  caseStudy: {
+    businessProblem: { type: String, default: '' },
+    roleAndScope: { type: String, default: '' },
+    architectureDetails: { type: String, default: '' },
+    hardestChallenge: { type: String, default: '' },
+    outcomes: { type: [String], default: [] },
+  },
   stories: [StorySchema],
 });
 
