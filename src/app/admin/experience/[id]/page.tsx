@@ -13,21 +13,16 @@ export default function EditExperiencePage() {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [personas, setPersonas] = useState<any[]>([]);
   const [defaultValues, setDefaultValues] = useState<Partial<ExperienceFormValues> | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [expRes, personasRes] = await Promise.all([
-          fetch(`/api/experience`), // the root api route returns all, wait let's just fetch all and find, or is there a single GET?
-          fetch('/api/personas')
-        ]);
+        const expRes = await fetch(`/api/experience`);
         
-        if (!expRes.ok || !personasRes.ok) throw new Error('Failed to fetch data');
+        if (!expRes.ok) throw new Error('Failed to fetch data');
         
         const experiences = await expRes.json();
-        const personasData = await personasRes.json();
         
         const expData = experiences.find((e: any) => e._id === id);
         
@@ -37,18 +32,25 @@ export default function EditExperiencePage() {
           return;
         }
 
-        setPersonas(personasData);
         setDefaultValues({
           title: expData.title || '',
           company: expData.company || '',
+          employmentType: expData.employmentType || 'Freelance',
           date: expData.date || '',
           description: expData.description || '',
+          keyMetric: expData.keyMetric || '',
           technologies: Array.isArray(expData.technologies) ? expData.technologies.join(', ') : expData.technologies || '',
           links: {
             website: expData.links?.website || '',
             github: expData.links?.github || '',
           },
-          allowedPersonas: expData.allowedPersonas || [],
+          caseStudy: {
+            businessProblem: expData.caseStudy?.businessProblem || '',
+            roleAndScope: expData.caseStudy?.roleAndScope || '',
+            architectureDetails: expData.caseStudy?.architectureDetails || '',
+            hardestChallenge: expData.caseStudy?.hardestChallenge || '',
+            outcomes: expData.caseStudy?.outcomes || [],
+          },
           stories: expData.stories || [],
         });
       } catch (error) {
@@ -110,7 +112,6 @@ export default function EditExperiencePage() {
       defaultValues={defaultValues as ExperienceFormValues}
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
-      personas={personas}
     />
   );
 }

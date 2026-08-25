@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import ExperienceForm, { ExperienceFormValues } from '@/components/admin/ExperienceForm';
 
@@ -9,14 +9,6 @@ export default function NewExperiencePage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [personas, setPersonas] = useState<any[]>([]);
-
-  useEffect(() => {
-    fetch('/api/personas')
-      .then(res => res.json())
-      .then(data => setPersonas(data))
-      .catch(console.error);
-  }, []);
 
   const handleSubmit = async (values: ExperienceFormValues) => {
     setIsSubmitting(true);
@@ -58,7 +50,6 @@ export default function NewExperiencePage() {
       title="Add New Experience"
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
-      personas={personas}
     />
   );
 }
