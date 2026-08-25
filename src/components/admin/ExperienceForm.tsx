@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -27,6 +26,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 const storyThemes = ['Problem Solved', 'Mistake Made', 'Conflict Resolved', 'Influenced Decision', 'Proudest Build'] as const;
+const employmentTypes = ['Freelance', 'Contract', 'Full-Time', 'Part-Time'] as const;
 
 export const storySchema = z.object({
   theme: z.enum(storyThemes),
@@ -37,17 +37,33 @@ export const storySchema = z.object({
   learning: z.string().min(5, 'Learning must be at least 5 characters.'),
 });
 
+export const caseStudySchema = z.object({
+  businessProblem: z.string().default(''),
+  roleAndScope: z.string().default(''),
+  architectureDetails: z.string().default(''),
+  hardestChallenge: z.string().default(''),
+  outcomes: z.array(z.string()).default([]),
+});
+
 export const experienceSchema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters.'),
   company: z.string().min(2, 'Company must be at least 2 characters.'),
+  employmentType: z.enum(employmentTypes).default('Freelance'),
   date: z.string().min(5, 'Date must be at least 5 characters.'),
   description: z.string().min(10, 'Description must be at least 10 characters.'),
+  keyMetric: z.string().default(''),
   technologies: z.string().min(2, 'Please add at least one technology.'),
   links: z.object({
     website: z.string().url().optional().or(z.literal('')),
     github: z.string().url().optional().or(z.literal('')),
   }).optional(),
-  allowedPersonas: z.array(z.string()).default([]),
+  caseStudy: caseStudySchema.default({
+    businessProblem: '',
+    roleAndScope: '',
+    architectureDetails: '',
+    hardestChallenge: '',
+    outcomes: [],
+  }),
   stories: z.array(storySchema).default([]),
 });
 
@@ -57,28 +73,40 @@ interface ExperienceFormProps {
   defaultValues?: Partial<ExperienceFormValues>;
   onSubmit: (values: ExperienceFormValues) => Promise<void>;
   isSubmitting: boolean;
-  personas: any[];
   title: string;
 }
 
-export default function ExperienceForm({ defaultValues, onSubmit, isSubmitting, personas, title }: ExperienceFormProps) {
+export default function ExperienceForm({ defaultValues, onSubmit, isSubmitting, title }: ExperienceFormProps) {
   const form = useForm<ExperienceFormValues>({
     resolver: zodResolver(experienceSchema),
     defaultValues: defaultValues || {
       title: '',
       company: '',
+      employmentType: 'Freelance',
       date: '',
       description: '',
+      keyMetric: '',
       technologies: '',
       links: { website: '', github: '' },
-      allowedPersonas: [],
+      caseStudy: {
+        businessProblem: '',
+        roleAndScope: '',
+        architectureDetails: '',
+        hardestChallenge: '',
+        outcomes: [],
+      },
       stories: [],
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields: storyFields, append: appendStory, remove: removeStory } = useFieldArray({
     control: form.control,
     name: 'stories',
+  });
+
+  const { fields: outcomeFields, append: appendOutcome, remove: removeOutcome } = useFieldArray({
+    control: form.control,
+    name: 'caseStudy.outcomes' as any,
   });
 
   return (
@@ -118,8 +146,29 @@ export default function ExperienceForm({ defaultValues, onSubmit, isSubmitting, 
                   <FormField control={form.control} name="title" render={({ field }) => ( <FormItem> <FormLabel>Job Title</FormLabel> <FormControl><Input placeholder="e.g. Full Stack Developer" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
                   <FormField control={form.control} name="company" render={({ field }) => ( <FormItem> <FormLabel>Company</FormLabel> <FormControl><Input placeholder="e.g. Google" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
                 </div>
-                <FormField control={form.control} name="date" render={({ field }) => ( <FormItem> <FormLabel>Date</FormLabel> <FormControl><Input placeholder="e.g. Jan 2023 - Present" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
-                <FormField control={form.control} name="description" render={({ field }) => ( <FormItem> <FormLabel>Description</FormLabel> <FormControl><Textarea rows={4} placeholder="Describe your role and responsibilities..." {...field} /></FormControl> <FormMessage /> </FormItem> )} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField control={form.control} name="employmentType" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Employment Type</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select employment type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {employmentTypes.map(type => (
+                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="date" render={({ field }) => ( <FormItem> <FormLabel>Date</FormLabel> <FormControl><Input placeholder="e.g. Jan 2023 - Present" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
+                </div>
+                <FormField control={form.control} name="description" render={({ field }) => ( <FormItem> <FormLabel>Description (Card Summary)</FormLabel> <FormControl><Textarea rows={4} placeholder="A short summary used as the hook on the UI card..." {...field} /></FormControl> <FormMessage /> </FormItem> )} />
+                <FormField control={form.control} name="keyMetric" render={({ field }) => ( <FormItem> <FormLabel>Key Metric</FormLabel> <FormControl><Input placeholder="e.g. Reduced load time by 40%" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
                 <FormField control={form.control} name="technologies" render={({ field }) => ( <FormItem> <FormLabel>Technologies (comma-separated)</FormLabel> <FormControl><Input placeholder="e.g. React, Node.js, MongoDB" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField control={form.control} name="links.website" render={({ field }) => ( <FormItem> <FormLabel>Website URL</FormLabel> <FormControl><Input placeholder="https://example.com" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
@@ -128,50 +177,86 @@ export default function ExperienceForm({ defaultValues, onSubmit, isSubmitting, 
               </CardContent>
             </Card>
 
-            {/* Card 2: Persona Targeting */}
+            {/* Card 2: Case Study */}
             <Card>
               <CardHeader>
-                <CardTitle>Persona Targeting</CardTitle>
+                <CardTitle>Case Study</CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">Deep-dive details for the experience detail page. All fields are optional.</p>
               </CardHeader>
-              <CardContent>
-                <FormField control={form.control} name="allowedPersonas" render={() => (
+              <CardContent className="space-y-4">
+                <FormField control={form.control} name="caseStudy.businessProblem" render={({ field }) => (
                   <FormItem>
-                    <div className="mb-4">
-                      <p className="text-sm text-muted-foreground">
-                        Select which personas this experience should be visible to. Leave blank to show for everyone.
-                      </p>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                      {personas.map((persona) => (
-                        <FormField
-                          key={persona._id}
-                          control={form.control}
-                          name="allowedPersonas"
-                          render={({ field }) => {
-                            return (
-                              <FormItem key={persona._id} className="flex flex-row items-center space-x-3 space-y-0 border border-border rounded-lg p-3 hover:bg-muted/50 transition-colors">
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(persona._id)}
-                                    onCheckedChange={(checked: boolean | 'indeterminate') => {
-                                      return checked === true
-                                        ? field.onChange([...(field.value || []), persona._id])
-                                        : field.onChange(field.value?.filter((value) => value !== persona._id))
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal cursor-pointer w-full text-sm">
-                                  {persona.name}
-                                </FormLabel>
-                              </FormItem>
-                            )
-                          }}
-                        />
-                      ))}
-                    </div>
+                    <FormLabel>The Business Problem</FormLabel>
+                    <FormControl><Textarea rows={3} placeholder="What business problem were you hired to solve?" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
+                <FormField control={form.control} name="caseStudy.roleAndScope" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>My Role & Scope</FormLabel>
+                    <FormControl><Textarea rows={3} placeholder="What was your specific role and scope of responsibility?" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="caseStudy.architectureDetails" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>System Architecture (supports Markdown)</FormLabel>
+                    <FormControl><Textarea rows={6} placeholder="Describe the system architecture. You can use Markdown and Mermaid diagrams here..." {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="caseStudy.hardestChallenge" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>The Hardest Technical Challenge</FormLabel>
+                    <FormControl><Textarea rows={3} placeholder="What was the hardest technical challenge you faced?" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                {/* Dynamic Outcomes List */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <FormLabel>Outcomes</FormLabel>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => appendOutcome('' as any)}
+                    >
+                      <PlusCircle className="mr-2 h-4 w-4" /> Add Outcome
+                    </Button>
+                  </div>
+                  {outcomeFields.length === 0 && (
+                    <div className="text-center p-4 border border-dashed rounded-lg text-muted-foreground text-sm">
+                      No outcomes added yet. Click &quot;Add Outcome&quot; to add a measurable result.
+                    </div>
+                  )}
+                  {outcomeFields.map((field, index) => (
+                    <div key={field.id} className="flex items-center gap-2">
+                      <FormField
+                        control={form.control}
+                        name={`caseStudy.outcomes.${index}` as any}
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormControl>
+                              <Input placeholder={`e.g. Improved conversion rate by 25%`} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:bg-destructive/10 shrink-0"
+                        onClick={() => removeOutcome(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
 
@@ -182,24 +267,24 @@ export default function ExperienceForm({ defaultValues, onSubmit, isSubmitting, 
                   <CardTitle>Story Builder (STAR Method)</CardTitle>
                   <p className="text-sm text-muted-foreground mt-1">Add behavioral stories to this experience.</p>
                 </div>
-                <Button type="button" variant="secondary" size="sm" onClick={() => append({ theme: 'Problem Solved', situation: '', challenge: '', action: '', result: '', learning: '' })}>
+                <Button type="button" variant="secondary" size="sm" onClick={() => appendStory({ theme: 'Problem Solved', situation: '', challenge: '', action: '', result: '', learning: '' })}>
                   <PlusCircle className="mr-2 h-4 w-4" /> Add Story
                 </Button>
               </CardHeader>
               <CardContent className="space-y-6">
-                {fields.length === 0 && (
+                {storyFields.length === 0 && (
                   <div className="text-center p-8 border border-dashed rounded-lg text-muted-foreground">
-                    No stories added yet. Click "Add Story" to build a behavioral narrative.
+                    No stories added yet. Click &quot;Add Story&quot; to build a behavioral narrative.
                   </div>
                 )}
-                {fields.map((field, index) => (
+                {storyFields.map((field, index) => (
                   <div key={field.id} className="relative border border-border rounded-xl p-4 sm:p-6 bg-background">
                     <Button 
                       type="button" 
                       variant="ghost" 
                       size="icon" 
                       className="absolute top-2 right-2 text-destructive hover:bg-destructive/10"
-                      onClick={() => remove(index)}
+                      onClick={() => removeStory(index)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

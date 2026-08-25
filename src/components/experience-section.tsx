@@ -1,11 +1,10 @@
 'use client';
 
-import { ExternalLink, Github, Target, Camera, Sparkles } from 'lucide-react';
+import { ExternalLink, Github, Target, Camera, Sparkles, TrendingUp } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { usePersona } from '@/context/PersonaContext';
 import { getSessionId } from '@/lib/telemetry';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
@@ -15,17 +14,17 @@ type Experience = {
     title: string;
     slug: string;
     company: string;
+    employmentType?: string;
     date: string;
     description: string;
+    keyMetric?: string;
     technologies: string[];
     links?: { website?: string; github?: string };
-    allowedPersonas?: string[];
 };
 
 const ROTATIONS = [-3, 4, -2, 5, -4, 3, -5, 2];
 
 const ExperienceSection = () => {
-    const { activePersona } = usePersona();
     const [experiences, setExperiences] = useState<Experience[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -58,14 +57,7 @@ const ExperienceSection = () => {
                 
                 if (!isMounted) return;
 
-                let filteredData = data;
-                if (activePersona) {
-                    filteredData = data.filter(xp => 
-                        !xp.allowedPersonas?.length || xp.allowedPersonas.includes(activePersona._id)
-                    );
-                }
-
-                setExperiences(filteredData || []);
+                setExperiences(data || []);
             } catch (error) { 
                 console.error(error); 
             } finally { 
@@ -78,7 +70,7 @@ const ExperienceSection = () => {
         return () => {
             isMounted = false; // Cleanup to prevent memory leaks
         };
-    }, [activePersona]);
+    }, []);
 
     useGSAP(() => {
         if (isLoading || !experiences.length || !sectionRef.current) return;
@@ -167,6 +159,14 @@ const ExperienceSection = () => {
                                         {xp.description}
                                     </div>
 
+                                    {xp.keyMetric && (
+                                        <div className="shrink-0 mt-2 mb-1">
+                                            <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] md:text-xs font-mono font-bold uppercase tracking-wider rounded-sm">
+                                                <TrendingUp className="w-3 h-3" /> {xp.keyMetric}
+                                            </span>
+                                        </div>
+                                    )}
+
                                     <div className="pt-6 shrink-0 border-t border-white/10 mt-4">
                                         <div className="flex flex-wrap gap-2">
                                             {xp.technologies.slice(0, 6).map(tech => (
@@ -188,7 +188,7 @@ const ExperienceSection = () => {
                                             onClick={() => trackClick(xp.company)}
                                             className="px-4 py-2 bg-blue-500 text-white font-bold rounded-full transition-colors shadow-lg hover:bg-blue-600 flex items-center gap-2 uppercase tracking-widest text-xs"
                                         >
-                                            <Target className="w-4 h-4" /> Narrative
+                                            <Target className="w-4 h-4" /> Read More
                                         </a>
                                         {xp.links?.website && (
                                             <a href={xp.links.website} target="_blank" rel="noreferrer" className="p-3 bg-white text-black hover:bg-amber-100 rounded-full transition-colors shadow-lg">
@@ -205,9 +205,16 @@ const ExperienceSection = () => {
 
                                 <div className="absolute bottom-0 left-0 w-full h-20 md:h-28 px-6 md:px-10 flex items-center justify-between pointer-events-none">
                                     <div className="flex flex-col">
-                                        <span className="text-black/80 font-black text-xl md:text-3xl uppercase tracking-tighter mix-blend-multiply">
-                                            {xp.company}
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-black/80 font-black text-xl md:text-3xl uppercase tracking-tighter mix-blend-multiply">
+                                                {xp.company}
+                                            </span>
+                                            {xp.employmentType && (
+                                                <span className="px-2 py-0.5 bg-black/10 text-black/60 text-[9px] md:text-[10px] font-mono font-bold uppercase tracking-widest rounded-sm border border-black/10">
+                                                    {xp.employmentType}
+                                                </span>
+                                            )}
+                                        </div>
                                         <span className="text-black/50 font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] mt-1 flex items-center gap-2">
                                             <Target className="w-3 h-3" /> OPERATION ARCHIVE
                                         </span>

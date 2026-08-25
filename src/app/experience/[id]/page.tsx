@@ -1,13 +1,15 @@
 import dbConnect from '@/lib/mongodb';
-import Experience from '@/models/Experience';
+import Experience, { ICaseStudy } from '@/models/Experience';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Target, AlertCircle, Handshake, Zap, Trophy, Briefcase, ChevronRight, Calendar, Building2 } from 'lucide-react';
+import { ArrowLeft, Target, AlertCircle, Handshake, Zap, Trophy, Briefcase, ChevronRight, Calendar, Building2, TrendingUp, Shield, Users, Cpu, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import StoryTelemetryObserver from '@/components/story-telemetry-observer';
 import ClientTracker from '@/components/client-tracker';
 import ExperienceLinks from '@/components/experience-links';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // Adapted for the dark brutalist theme
 const themeIcons: Record<string, React.ReactNode> = {
@@ -26,6 +28,14 @@ const themeColors: Record<string, string> = {
   'Proudest Build': 'text-blue-500 border-blue-500/30 bg-blue-500/5',
 };
 
+// Section header icons for case study sections
+const caseStudySections: Array<{ key: keyof ICaseStudy; title: string; icon: React.ReactNode; isMarkdown?: boolean }> = [
+  { key: 'businessProblem', title: 'The Business Problem', icon: <Shield className="w-5 h-5" /> },
+  { key: 'roleAndScope', title: 'My Role & Scope', icon: <Users className="w-5 h-5" /> },
+  { key: 'architectureDetails', title: 'System Architecture', icon: <Cpu className="w-5 h-5" />, isMarkdown: true },
+  { key: 'hardestChallenge', title: 'The Hardest Technical Challenge', icon: <AlertTriangle className="w-5 h-5" /> },
+];
+
 export default async function ExperienceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   
@@ -41,6 +51,9 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
     ...experience,
     _id: experience._id.toString(),
   };
+
+  const caseStudy: ICaseStudy = experience.caseStudy || { businessProblem: '', roleAndScope: '', architectureDetails: '', hardestChallenge: '', outcomes: [] };
+  const hasCaseStudy = caseStudy.businessProblem || caseStudy.roleAndScope || caseStudy.architectureDetails || caseStudy.hardestChallenge || (caseStudy.outcomes && caseStudy.outcomes.length > 0);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-slate-200 selection:bg-blue-500/30 font-sans relative flex flex-col overflow-x-hidden">
@@ -75,9 +88,16 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white uppercase leading-[0.9] tracking-tighter break-words">
               {experience.title}
             </h1>
-            <h2 className="text-2xl md:text-4xl font-bold text-blue-500 uppercase tracking-tight">
-              @ {experience.company}
-            </h2>
+            <div className="flex items-center gap-3 flex-wrap">
+              <h2 className="text-2xl md:text-4xl font-bold text-blue-500 uppercase tracking-tight">
+                @ {experience.company}
+              </h2>
+              {experience.employmentType && (
+                <span className="inline-flex items-center px-3 py-1 border-2 border-blue-500/30 text-blue-400 font-mono text-[10px] md:text-xs font-bold uppercase tracking-widest bg-blue-500/5">
+                  {experience.employmentType}
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-2 font-mono text-slate-400 text-sm md:text-base tracking-widest uppercase border-b border-white/10 pb-4 inline-flex">
               <Calendar className="w-4 h-4" /> {experience.date}
             </div>
@@ -91,6 +111,14 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
             ))}
           </div>
 
+          {experience.keyMetric && (
+            <div className="mb-10">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border-2 border-emerald-500/30 text-emerald-400 font-mono text-sm font-bold uppercase tracking-wider">
+                <TrendingUp className="w-4 h-4" /> {experience.keyMetric}
+              </span>
+            </div>
+          )}
+
           <div className="font-mono text-slate-400 text-sm md:text-base leading-relaxed whitespace-pre-wrap max-w-3xl border-l-4 border-blue-500/50 pl-6 py-2 bg-gradient-to-r from-blue-500/5 to-transparent">
             <span className="text-blue-500 font-bold mr-2 tracking-widest uppercase text-xs">CAREER_SUMMARY:</span>
             {experience.description}
@@ -103,6 +131,65 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
             />
           </div>
         </header>
+
+        {/* Case Study Sections */}
+        {hasCaseStudy && (
+          <div className="relative mb-20">
+            <div className="flex items-center gap-4 mb-16 border-b-2 border-white/10 pb-6">
+              <Target className="w-6 h-6 text-blue-500" />
+              <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-widest">
+                Case_Study
+              </h2>
+            </div>
+
+            <div className="space-y-12">
+              {caseStudySections.map(({ key, title, icon, isMarkdown }) => {
+                const content = (caseStudy as any)[key];
+                if (!content) return null;
+
+                return (
+                  <div key={key} className="group">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="text-blue-500">{icon}</div>
+                      <h3 className="text-[10px] md:text-xs font-bold text-white/40 uppercase tracking-widest flex items-center gap-2">
+                        <ChevronRight className="w-3 h-3 text-blue-500" /> {title}
+                      </h3>
+                    </div>
+                    {isMarkdown ? (
+                      <div className="prose prose-invert prose-sm md:prose-base max-w-none font-mono text-slate-300 leading-relaxed bg-white/[0.02] border-l-2 border-blue-500/30 p-4 md:p-6 prose-headings:text-white prose-headings:font-bold prose-headings:uppercase prose-headings:tracking-wider prose-code:text-blue-400 prose-code:bg-blue-500/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-pre:bg-[#0f0f11] prose-pre:border prose-pre:border-white/10 prose-a:text-blue-400 prose-strong:text-white prose-li:marker:text-blue-500">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      <p className="text-sm md:text-base text-slate-300 leading-relaxed font-light whitespace-pre-wrap bg-white/[0.02] border-l-2 border-blue-500/30 p-4 md:p-6">
+                        {content}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* Outcomes */}
+              {caseStudy.outcomes && caseStudy.outcomes.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="text-blue-500"><CheckCircle2 className="w-5 h-5" /></div>
+                    <h3 className="text-[10px] md:text-xs font-bold text-white/40 uppercase tracking-widest flex items-center gap-2">
+                      <ChevronRight className="w-3 h-3 text-blue-500" /> Outcomes
+                    </h3>
+                  </div>
+                  <ul className="space-y-3 bg-white/[0.02] border-l-2 border-emerald-500/30 p-4 md:p-6">
+                    {caseStudy.outcomes.map((outcome: string, i: number) => (
+                      <li key={i} className="flex items-start gap-3 text-sm md:text-base text-slate-300 leading-relaxed font-light">
+                        <span className="text-emerald-400 font-mono text-xs mt-1 shrink-0">▸</span>
+                        {outcome}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* The Narrative (STAR Stories) */}
         <div className="relative">
@@ -172,7 +259,7 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
                           <div className="pt-6 border-t border-white/10">
                             <h4 className="text-[10px] md:text-xs font-bold text-white/40 uppercase tracking-widest mb-3">SYSTEM_TAKEAWAY</h4>
                             <p className="text-sm md:text-base text-slate-400 font-mono italic">
-                              "{story.learning}"
+                              &quot;{story.learning}&quot;
                             </p>
                           </div>
                         </div>

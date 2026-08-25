@@ -53,9 +53,9 @@ export default function Home() {
       {/* {!isAdminPage && <Header initialLinks={links || {}} />} */}
       <main className="relative w-full overflow-x-hidden block">
         <HeroSection initialLinks={links || {}} />
-        <SkillsSection key="skills" />
         <ExperienceSection key="experience" />
         <ProjectSpotlight key="projects" />
+        {/* <SkillsSection key="skills" /> */}
         <ContactSection /> 
       </main>
 
