@@ -22,10 +22,18 @@ const nodeVariant = {
   },
 };
 
+export interface RoadmapItemInput {
+  id?: string;
+  phase?: string;
+  label?: string;
+  title: string;
+  description: string;
+}
+
 export default function RoadmapTimeline({
   roadmap,
 }: {
-  roadmap: TimelineEvent[];
+  roadmap: RoadmapItemInput[];
 }) {
   return (
     <section
@@ -64,7 +72,7 @@ export default function RoadmapTimeline({
 
             return (
               <motion.li
-                key={event.id}
+                key={event.id || event.phase || `milestone-${idx}`}
                 variants={nodeVariant}
                 className="group relative pl-12 md:pl-14"
               >
@@ -86,7 +94,7 @@ export default function RoadmapTimeline({
                   <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--theme-primary)]/30 bg-[var(--theme-primary)]/10 px-2.5 py-0.5 text-[10px] font-bold tracking-widest uppercase text-[var(--theme-primary)]">
                       <Icon className="h-3 w-3" />
-                      {event.label}
+                      {event.phase || event.label || `Phase ${idx + 1}`}
                     </span>
 
                     <span className="text-[10px] font-semibold uppercase tracking-widest opacity-50 font-mono">

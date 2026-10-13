@@ -1,14 +1,76 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { architecturesData } from "@/data/architectures";
+import dbConnect from "@/lib/mongodb";
+import Architecture from "@/models/Architecture";
+import { architecturesData, type ArchitectureCaseStudy } from "@/data/architectures";
 import HeroHUD from "./components/HeroHUD";
 import BentoGrid from "./components/BentoGrid";
 import RoadmapTimeline from "./components/RoadmapTimeline";
 
-// ─── Static Generation Params (Open/Closed) ────────────────────────────────
+export const dynamic = "force-dynamic";
 
-export function generateStaticParams() {
-  return Object.keys(architecturesData).map((slug) => ({ slug }));
+// ─── Data Access: MongoDB First with Static Dictionary Fallback ────────────
+
+async function getArchitectureCaseStudy(slug: string): Promise<ArchitectureCaseStudy | null> {
+  try {
+    await dbConnect();
+    const doc = await Architecture.findOne({ slug }).lean();
+    if (doc) {
+      return {
+        slug: doc.slug,
+        name: doc.name,
+        theme: {
+          primaryHex: doc.theme?.primaryHex || "#d6e9e3ff",
+          backgroundHex: doc.theme?.backgroundHex || "#0a0a0c",
+          textHex: doc.theme?.textHex || "#f8fafc",
+        },
+        hero: {
+          title: doc.hero?.title || "",
+          subtitle: doc.hero?.subtitle || "",
+          metrics: (doc.hero?.metrics || []).map((m: any) => ({
+            title: m.title,
+            value: m.value,
+            ariaLabel: m.ariaLabel || `${m.title}: ${m.value}`,
+          })),
+        },
+        challenges: (doc.challenges || []).map((c: any) => ({
+          id: c.id,
+          title: c.title,
+          teaser: c.teaser,
+          problem: c.problem,
+          solution: c.solution,
+          impact: c.impact,
+          visualKey: c.visualKey,
+        })),
+        roadmap: (doc.roadmap || []).map((r: any, idx: number) => ({
+          id: `roadmap-${idx}`,
+          label: r.phase || `Phase ${idx + 1}`,
+          title: r.title,
+          description: r.description,
+        })),
+      };
+    }
+  } catch (error) {
+    console.warn(`[getArchitectureCaseStudy] MongoDB fetch for "${slug}" failed, falling back to static data:`, error);
+  }
+
+  // Fallback to static dictionary
+  return architecturesData[slug] || null;
+}
+
+// ─── Static Generation Params ───────────────────────────────────────────────
+
+export async function generateStaticParams() {
+  const staticSlugs = Object.keys(architecturesData);
+  try {
+    await dbConnect();
+    const docs = await Architecture.find({}, { slug: 1 }).lean();
+    const dbSlugs = docs.map((d: any) => d.slug);
+    const allSlugs = Array.from(new Set([...staticSlugs, ...dbSlugs]));
+    return allSlugs.map((slug) => ({ slug }));
+  } catch {
+    return staticSlugs.map((slug) => ({ slug }));
+  }
 }
 
 // ─── Dynamic Metadata ───────────────────────────────────────────────────────
@@ -19,7 +81,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const data = architecturesData[slug];
+  const data = await getArchitectureCaseStudy(slug);
 
   if (!data) {
     return {
@@ -46,7 +108,7 @@ export default async function ArchitectureCaseStudyPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const data = architecturesData[slug];
+  const data = await getArchitectureCaseStudy(slug);
 
   if (!data) {
     notFound();

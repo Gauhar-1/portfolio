@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { 
   LayoutDashboard, User, Briefcase, Code, Link as LinkIcon, 
-  MessageSquare, Settings, Activity, Users, FileText, Anchor
+  MessageSquare, Settings, Activity, Users, FileText, Anchor, Network
 } from 'lucide-react';
 
 const navGroups = [
@@ -21,6 +21,7 @@ const navGroups = [
       { name: 'Profile', href: '/admin/profile', icon: User },
       { name: 'Projects', href: '/admin/projects', icon: Code },
       { name: 'Experience', href: '/admin/experience', icon: Briefcase },
+      { name: 'Architectures', href: '/admin/architectures', icon: Network },
       { name: 'Skills', href: '/admin/skills', icon: Anchor },
       { name: 'Links', href: '/admin/links', icon: LinkIcon },
     ]
