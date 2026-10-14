@@ -4,9 +4,15 @@ export const VISUAL_KEY_OPTIONS = [
   { value: 'chart', label: 'Chart Visual (Line / Spike / Analytics)' },
   { value: 'security', label: 'Security Visual (Zero-Trust / Cryptographic Lock)' },
   { value: 'server', label: 'Server Visual (Decoupled Mesh / Ingestion)' },
+  { value: 'layout-orchestrator', label: 'Layout Orchestrator (Zero-Deploy Storefront Slots)' },
+  { value: 'block-ast', label: 'Block AST (Polymorphic Editorial Studio)' },
+  { value: 'schema-compiler', label: 'Schema Compiler (Form Engine / JSON-to-UI)' },
   { value: 'ChartVisual', label: 'ChartVisual (Alternative Registry Key)' },
   { value: 'SecurityVisual', label: 'SecurityVisual (Alternative Registry Key)' },
   { value: 'ServerVisual', label: 'ServerVisual (Alternative Registry Key)' },
+  { value: 'LayoutOrchestratorVisual', label: 'LayoutOrchestratorVisual (Alternative Registry Key)' },
+  { value: 'BlockAstVisual', label: 'BlockAstVisual (Alternative Registry Key)' },
+  { value: 'SchemaCompilerVisual', label: 'SchemaCompilerVisual (Alternative Registry Key)' },
 ] as const;
 
 export const architectureSchema = z.object({

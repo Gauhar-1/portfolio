@@ -105,7 +105,14 @@ function BentoCardItem({
       />
 
       {/* ── Card body with Machined Glass resting state & reactive hover border ── */}
-      <div className="relative flex h-full w-full flex-col justify-between overflow-hidden rounded-2xl border border-[var(--theme-text)]/10 bg-[var(--theme-text)]/[0.03] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md transition-colors duration-300 group-hover:border-[var(--theme-primary)]/30 group-hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+      <div 
+        className="relative flex h-full w-full flex-col justify-between overflow-hidden rounded-2xl p-6 backdrop-blur-md transition-all duration-300"
+        style={{
+          backgroundColor: "color-mix(in srgb, var(--theme-bg, #0a0a0c) 92%, var(--theme-text, #f8fafc) 5%)",
+          border: "1px solid color-mix(in srgb, var(--theme-text, #f8fafc) 15%, transparent)",
+          boxShadow: "inset 0 1px 0 color-mix(in srgb, var(--theme-text, #f8fafc) 10%, transparent)",
+        }}
+      >
         {/* Spotlight inner glow wash on hover */}
         <motion.div
           className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100 hidden md:block"
@@ -115,20 +122,36 @@ function BentoCardItem({
         <div className="flex flex-col">
           {/* Top header row: Pill + Step Tag */}
           <div className="mb-4 flex items-center justify-between">
-            <span className="inline-flex items-center rounded-full border border-[var(--theme-primary)]/30 bg-[var(--theme-primary)]/10 px-2.5 py-1 text-[11px] font-semibold tracking-wider uppercase text-[var(--theme-primary)]">
+            <span 
+              className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wider uppercase font-mono"
+              style={{
+                backgroundColor: "color-mix(in srgb, var(--theme-primary, #10B981) 14%, var(--theme-bg, #0a0a0c))",
+                border: "1px solid color-mix(in srgb, var(--theme-primary, #10B981) 45%, transparent)",
+                color: "var(--theme-primary, #10B981)",
+              }}
+            >
               Architecture Pattern
             </span>
 
-            <span className="text-[11px] font-mono opacity-50 uppercase">
+            <span 
+              className="text-[11px] font-mono uppercase font-medium"
+              style={{ color: "color-mix(in srgb, var(--theme-text, #f8fafc) 55%, var(--theme-bg, #0a0a0c))" }}
+            >
               ID // {card.id}
             </span>
           </div>
 
           {/* Title & Teaser */}
-          <h3 className="text-xl font-bold tracking-tight text-[var(--theme-text)] transition-colors duration-200 sm:text-2xl">
+          <h3 
+            className="text-xl font-bold tracking-tight sm:text-2xl"
+            style={{ color: "var(--theme-text, #f8fafc)" }}
+          >
             {card.title}
           </h3>
-          <p className="mt-2 text-sm leading-relaxed tracking-tight opacity-70">
+          <p 
+            className="mt-2 text-sm leading-relaxed tracking-tight"
+            style={{ color: "color-mix(in srgb, var(--theme-text, #f8fafc) 78%, var(--theme-bg, #0a0a0c))" }}
+          >
             {card.teaser}
           </p>
 
@@ -139,11 +162,24 @@ function BentoCardItem({
         </div>
 
         {/* Footer: Interactive explore affordance */}
-        <div className="mt-6 flex items-center justify-between border-t border-[var(--theme-text)]/10 pt-4">
-          <span className="text-xs font-semibold uppercase tracking-wider opacity-60 transition-colors group-hover:text-[var(--theme-primary)] group-hover:opacity-100">
+        <div 
+          className="mt-6 flex items-center justify-between pt-4"
+          style={{ borderTop: "1px solid color-mix(in srgb, var(--theme-text, #f8fafc) 15%, transparent)" }}
+        >
+          <span 
+            className="text-xs font-semibold uppercase tracking-wider transition-colors group-hover:text-[var(--theme-primary)]"
+            style={{ color: "color-mix(in srgb, var(--theme-text, #f8fafc) 65%, var(--theme-bg, #0a0a0c))" }}
+          >
             Inspect Architecture Decision
           </span>
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--theme-text)]/[0.05] opacity-70 transition-all duration-200 group-hover:translate-x-1 group-hover:bg-[var(--theme-primary)]/20 group-hover:text-[var(--theme-primary)] group-hover:opacity-100">
+          <span 
+            className="inline-flex h-7 w-7 items-center justify-center rounded-full transition-all duration-200 group-hover:translate-x-1"
+            style={{
+              backgroundColor: "color-mix(in srgb, var(--theme-bg, #0a0a0c) 84%, var(--theme-text, #f8fafc) 9%)",
+              border: "1px solid color-mix(in srgb, var(--theme-text, #f8fafc) 15%, transparent)",
+              color: "var(--theme-text, #f8fafc)",
+            }}
+          >
             <ArrowRight className="h-3.5 w-3.5" />
           </span>
         </div>

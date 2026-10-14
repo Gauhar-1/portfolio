@@ -35,23 +35,16 @@ export default function EditExperiencePage() {
         setDefaultValues({
           title: expData.title || '',
           company: expData.company || '',
+          slug: expData.slug || (expData.company ? expData.company.toLowerCase().replace(/\s+/g, '') : ''),
+          domainTag: expData.domainTag || 'Systems & Full-Stack Architecture',
           employmentType: expData.employmentType || 'Freelance',
           date: expData.date || '',
           description: expData.description || '',
-          keyMetric: expData.keyMetric || '',
           technologies: Array.isArray(expData.technologies) ? expData.technologies.join(', ') : expData.technologies || '',
           links: {
             website: expData.links?.website || '',
             github: expData.links?.github || '',
           },
-          caseStudy: {
-            businessProblem: expData.caseStudy?.businessProblem || '',
-            roleAndScope: expData.caseStudy?.roleAndScope || '',
-            architectureDetails: expData.caseStudy?.architectureDetails || '',
-            hardestChallenge: expData.caseStudy?.hardestChallenge || '',
-            outcomes: expData.caseStudy?.outcomes || [],
-          },
-          stories: expData.stories || [],
         });
       } catch (error) {
         console.error(error);

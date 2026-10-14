@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Edit, PlusCircle, Trash2 } from 'lucide-react';
+import { Edit, PlusCircle, Trash2, CheckCircle2, AlertCircle, ExternalLink } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +29,9 @@ type Experience = {
   _id: string;
   title: string;
   company: string;
+  slug: string;
+  domainTag?: string;
+  hasArchitecture?: boolean;
   date: string;
 };
 
@@ -79,7 +82,12 @@ export default function ManageExperiencePage() {
     <div className="min-h-screen bg-secondary p-4 sm:p-6 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Manage Experience</h1>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Manage Experience</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Deterministic slug joins each experience to its corresponding Architecture deep-dive engine.
+            </p>
+          </div>
           <div className="flex gap-4">
             <Button asChild>
               <Link href="/admin/experience/new">
@@ -92,12 +100,13 @@ export default function ManageExperiencePage() {
           </div>
         </div>
 
-        <div className="bg-card rounded-lg border">
+        <div className="bg-card rounded-lg border shadow-sm">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Company</TableHead>
+                <TableHead>Role Title</TableHead>
+                <TableHead>Company & Slug</TableHead>
+                <TableHead>Architecture Engine</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -106,18 +115,54 @@ export default function ManageExperiencePage() {
               {experiences.length > 0 ? (
                 experiences.map((exp) => (
                   <TableRow key={exp._id}>
-                    <TableCell className="font-medium">{exp.title}</TableCell>
-                    <TableCell>{exp.company}</TableCell>
-                    <TableCell>{exp.date}</TableCell>
+                    <TableCell className="font-semibold text-foreground">
+                      {exp.title}
+                      {exp.domainTag && (
+                        <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
+                          {exp.domainTag}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium text-foreground">{exp.company}</div>
+                      <div className="text-xs font-mono text-muted-foreground">/{exp.slug}</div>
+                    </TableCell>
+                    <TableCell>
+                      {exp.hasArchitecture ? (
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                          <span>Linked</span>
+                          <Link
+                            href={`/architecture/${exp.slug}`}
+                            target="_blank"
+                            className="text-emerald-300 hover:text-emerald-200 ml-0.5"
+                          >
+                            <ExternalLink className="w-3 h-3 inline" />
+                          </Link>
+                        </div>
+                      ) : (
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                          <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                          <span>Missing Engine</span>
+                          <Link
+                            href="/admin/architectures/new"
+                            className="text-amber-300 hover:underline ml-1 text-[11px]"
+                          >
+                            + Add
+                          </Link>
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground font-mono text-xs">{exp.date}</TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/admin/experience/${exp._id}`}>
+                        <Link href={`/admin/experience/${exp._id}`} aria-label="Edit experience">
                           <Edit className="h-4 w-4" />
                         </Link>
                       </Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                           <Button variant="ghost" size="icon">
+                           <Button variant="ghost" size="icon" aria-label="Delete experience">
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
                         </AlertDialogTrigger>
@@ -125,7 +170,7 @@ export default function ManageExperiencePage() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete the experience entry.
+                              This action cannot be undone. This will permanently delete the experience entry for "{exp.company}".
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -144,7 +189,7 @@ export default function ManageExperiencePage() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center h-24">
+                  <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
                     No experience found. Add one to get started!
                   </TableCell>
                 </TableRow>

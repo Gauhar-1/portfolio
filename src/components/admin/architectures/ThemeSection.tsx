@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +14,12 @@ interface ThemeSectionProps {
 }
 
 export function ThemeSection({ form }: ThemeSectionProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const { register, watch, setValue, formState: { errors } } = form;
 
   const name = watch('name');
@@ -113,17 +120,21 @@ export function ThemeSection({ form }: ThemeSectionProps) {
                 {/* Live Circle Swatch with hidden native color input */}
                 <label
                   htmlFor="primaryColorPicker"
+                  suppressHydrationWarning
                   className="relative h-7 w-7 rounded-full border border-border shadow-xs cursor-pointer overflow-hidden transition-transform hover:scale-110 flex items-center justify-center"
                   style={{ backgroundColor: primaryHex }}
                   title="Click to pick color"
                 >
-                  <input
-                    id="primaryColorPicker"
-                    type="color"
-                    value={primaryHex.startsWith('#') ? primaryHex.slice(0, 7) : '#10b981'}
-                    onChange={(e) => setValue('theme.primaryHex', e.target.value, { shouldValidate: true })}
-                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                  />
+                  {mounted && (
+                    <input
+                      id="primaryColorPicker"
+                      type="color"
+                      suppressHydrationWarning
+                      value={primaryHex.startsWith('#') ? primaryHex.slice(0, 7) : '#10b981'}
+                      onChange={(e) => setValue('theme.primaryHex', e.target.value, { shouldValidate: true })}
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    />
+                  )}
                 </label>
               </div>
               <Input
@@ -148,17 +159,21 @@ export function ThemeSection({ form }: ThemeSectionProps) {
                 </Label>
                 <label
                   htmlFor="bgColorPicker"
+                  suppressHydrationWarning
                   className="relative h-7 w-7 rounded-full border border-border shadow-xs cursor-pointer overflow-hidden transition-transform hover:scale-110 flex items-center justify-center"
                   style={{ backgroundColor: backgroundHex }}
                   title="Click to pick color"
                 >
-                  <input
-                    id="bgColorPicker"
-                    type="color"
-                    value={backgroundHex.startsWith('#') ? backgroundHex.slice(0, 7) : '#0a0a0c'}
-                    onChange={(e) => setValue('theme.backgroundHex', e.target.value, { shouldValidate: true })}
-                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                  />
+                  {mounted && (
+                    <input
+                      id="bgColorPicker"
+                      type="color"
+                      suppressHydrationWarning
+                      value={backgroundHex.startsWith('#') ? backgroundHex.slice(0, 7) : '#0a0a0c'}
+                      onChange={(e) => setValue('theme.backgroundHex', e.target.value, { shouldValidate: true })}
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    />
+                  )}
                 </label>
               </div>
               <Input
@@ -183,17 +198,21 @@ export function ThemeSection({ form }: ThemeSectionProps) {
                 </Label>
                 <label
                   htmlFor="textColorPicker"
+                  suppressHydrationWarning
                   className="relative h-7 w-7 rounded-full border border-border shadow-xs cursor-pointer overflow-hidden transition-transform hover:scale-110 flex items-center justify-center"
                   style={{ backgroundColor: textHex }}
                   title="Click to pick color"
                 >
-                  <input
-                    id="textColorPicker"
-                    type="color"
-                    value={textHex.startsWith('#') ? textHex.slice(0, 7) : '#f8fafc'}
-                    onChange={(e) => setValue('theme.textHex', e.target.value, { shouldValidate: true })}
-                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                  />
+                  {mounted && (
+                    <input
+                      id="textColorPicker"
+                      type="color"
+                      suppressHydrationWarning
+                      value={textHex.startsWith('#') ? textHex.slice(0, 7) : '#f8fafc'}
+                      onChange={(e) => setValue('theme.textHex', e.target.value, { shouldValidate: true })}
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    />
+                  )}
                 </label>
               </div>
               <Input

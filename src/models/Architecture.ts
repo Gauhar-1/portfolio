@@ -86,7 +86,25 @@ const ChallengeSchema = new Schema<IArchitectureChallenge>(
     problem: { type: String, required: true },
     solution: { type: String, required: true },
     impact: { type: String, required: true },
-    visualKey: { type: String, required: true, default: 'chart' },
+    visualKey: {
+      type: String,
+      required: true,
+      default: 'chart',
+      enum: [
+        'chart',
+        'security',
+        'server',
+        'layout-orchestrator',
+        'block-ast',
+        'schema-compiler',
+        'ChartVisual',
+        'SecurityVisual',
+        'ServerVisual',
+        'LayoutOrchestratorVisual',
+        'BlockAstVisual',
+        'SchemaCompilerVisual',
+      ],
+    },
   },
   { _id: false }
 );
