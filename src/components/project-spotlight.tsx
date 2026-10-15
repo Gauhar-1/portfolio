@@ -58,6 +58,9 @@ const ProjectSpotlight = () => {
         const fetchProjects = async () => {
             try {
                 const res = await fetch('/api/projects');
+                if (!res.ok) {
+                    throw new Error(`Failed to fetch projects: ${res.status}`);
+                }
                 const data: Project[] = await res.json();
 
                 if (!isMounted) return;

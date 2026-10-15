@@ -421,13 +421,16 @@ const ExperienceSection = () => {
         const fetchExperiences = async () => {
             try {
                 const res = await fetch('/api/experience');
+                if (!res.ok) {
+                    throw new Error(`Failed to fetch experiences: ${res.status}`);
+                }
                 const data: Experience[] = await res.json();
                 
                 if (!isMounted) return;
 
                 setExperiences(data || []);
             } catch (error) { 
-                console.error(error); 
+                console.error("Error loading experiences:", error); 
             } finally { 
                 if (isMounted) setIsLoading(false); 
             }

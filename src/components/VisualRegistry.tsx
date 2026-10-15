@@ -2,7 +2,24 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ShieldCheck, Server, Database, Activity, Lock, Cpu } from "lucide-react";
+import {
+  ShieldCheck,
+  Server,
+  Database,
+  Activity,
+  Lock,
+  Cpu,
+  Network,
+  Radio,
+  Share2,
+  CheckCircle2,
+  ShieldAlert,
+  Timer,
+  Gamepad2,
+  Coins,
+  Check,
+  Box,
+} from "lucide-react";
 
 // ─── Adaptive Strict 3-Token Mathematical Style Tokens ──────────────────────
 
@@ -557,7 +574,588 @@ export function SchemaCompilerVisual() {
   );
 }
 
-// ─── 7. DefaultVisual: Generic System Fallback ──────────────────────────────
+// ─── 7. ServiceMeshVisual: Decoupled Microservices & Regional Partitioning ──
+
+export function ServiceMeshVisual() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none relative h-28 w-full overflow-hidden rounded-xl p-2.5 flex flex-col justify-between"
+      style={outerContainerStyle}
+    >
+      <div className="flex items-center justify-between text-[10px] font-mono">
+        <span style={textSecondaryStyle}>API_GATEWAY // MESH</span>
+        <span
+          className="rounded px-1.5 py-0.5 text-[9px] font-semibold tracking-wider uppercase"
+          style={activeHighlightStyle}
+        >
+          100% ISOLATED
+        </span>
+      </div>
+
+      <div className="my-0.5 flex items-center justify-between gap-1.5">
+        {/* Ingress Edge Gateway */}
+        <div
+          className="flex flex-col items-center justify-center rounded px-2 py-1 text-center shrink-0 min-w-[68px]"
+          style={inactiveSlotStyle}
+        >
+          <Network className="h-3.5 w-3.5 mb-0.5" style={{ color: "var(--theme-primary, #10B981)" }} />
+          <span className="text-[7px] font-mono font-bold tracking-tight" style={textSecondaryStyle}>
+            [EDGE_GATEWAY]
+          </span>
+          <span className="text-[6px] font-mono" style={{ color: "var(--theme-primary, #10B981)" }}>
+            INGRESS :443
+          </span>
+        </div>
+
+        {/* Animated Connector Splitting Lines */}
+        <div className="relative flex-1 h-10 flex items-center justify-center">
+          <svg className="w-full h-full" viewBox="0 0 50 36" fill="none" preserveAspectRatio="none">
+            {/* Top Branch */}
+            <path
+              d="M 2 18 C 20 18, 25 8, 48 8"
+              stroke="color-mix(in srgb, var(--theme-text, #f8fafc) 20%, transparent)"
+              strokeWidth="1.25"
+            />
+            <motion.path
+              d="M 2 18 C 20 18, 25 8, 48 8"
+              stroke="var(--theme-primary, #10B981)"
+              strokeWidth="1.5"
+              strokeDasharray="4 6"
+              animate={{ strokeDashoffset: [-20, 0] }}
+              transition={{ duration: 1.4, repeat: Infinity, ease: "linear" }}
+            />
+            {/* Bottom Branch */}
+            <path
+              d="M 2 18 C 20 18, 25 28, 48 28"
+              stroke="color-mix(in srgb, var(--theme-text, #f8fafc) 20%, transparent)"
+              strokeWidth="1.25"
+            />
+            <motion.path
+              d="M 2 18 C 20 18, 25 28, 48 28"
+              stroke="var(--theme-primary, #10B981)"
+              strokeWidth="1.5"
+              strokeDasharray="4 6"
+              animate={{ strokeDashoffset: [-20, 0] }}
+              transition={{ duration: 1.4, repeat: Infinity, ease: "linear", delay: 0.7 }}
+            />
+          </svg>
+        </div>
+
+        {/* Isolated Service Boxes */}
+        <div className="flex flex-col gap-1 min-w-[105px]">
+          <div
+            className="flex items-center justify-between rounded px-1.5 py-0.5 text-[7px] font-mono"
+            style={inactiveSlotStyle}
+          >
+            <div className="flex items-center gap-1">
+              <span className="h-1 w-1 rounded-full animate-pulse" style={{ backgroundColor: "var(--theme-primary, #10B981)" }} />
+              <span className="font-bold truncate" style={textSecondaryStyle}>[PUBLIC_FEED_REPLICA]</span>
+            </div>
+            <span className="text-[6px] font-bold" style={{ color: "var(--theme-primary, #10B981)" }}>RO</span>
+          </div>
+
+          <div
+            className="flex items-center justify-between rounded px-1.5 py-0.5 text-[7px] font-mono"
+            style={activeHighlightStyle}
+          >
+            <div className="flex items-center gap-1">
+              <Lock className="h-2 w-2 shrink-0" />
+              <span className="font-bold truncate">[PRIVATE_ADMIN_SUBNET]</span>
+            </div>
+            <span className="text-[6px] font-bold">AIRGAP</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="text-[9px] font-mono flex items-center justify-between" style={textMutedStyle}>
+        <span>Regional Partitioning</span>
+        <span>Zero Shared State</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── 8. PubSubStreamVisual: Real-Time Campaign Messaging Pipeline ────────────
+
+export function PubSubStreamVisual() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none relative h-28 w-full overflow-hidden rounded-xl p-2.5 flex flex-col justify-between"
+      style={outerContainerStyle}
+    >
+      <div className="flex items-center justify-between text-[10px] font-mono">
+        <span style={textSecondaryStyle}>REDIS_PUBSUB // WS</span>
+        <span
+          className="rounded px-1.5 py-0.5 text-[9px] font-semibold tracking-wider uppercase"
+          style={activeHighlightStyle}
+        >
+          &lt; 45MS BROADCAST
+        </span>
+      </div>
+
+      <div className="my-0.5 flex items-center justify-between gap-1 text-[7px] font-mono">
+        {/* Event Publisher */}
+        <div
+          className="flex flex-col items-center justify-center rounded px-1.5 py-1 text-center shrink-0 min-w-[62px]"
+          style={inactiveSlotStyle}
+        >
+          <Radio className="h-3 w-3 mb-0.5" style={{ color: "var(--theme-primary, #10B981)" }} />
+          <span className="font-bold tracking-tight truncate max-w-[60px]" style={textSecondaryStyle}>
+            [ISSUE_MUTATION]
+          </span>
+          <span className="text-[6px]" style={{ color: "var(--theme-primary, #10B981)" }}>PUB_EVENT</span>
+        </div>
+
+        {/* Pulse Connector to Exchange */}
+        <div className="relative w-5 flex items-center justify-center">
+          <div
+            className="h-px w-full"
+            style={{
+              background: "linear-gradient(to right, color-mix(in srgb, var(--theme-text, #f8fafc) 20%, transparent), var(--theme-primary, #10B981))",
+            }}
+          />
+          <motion.div
+            className="absolute h-1.5 w-1.5 rounded-full"
+            style={{
+              backgroundColor: "var(--theme-primary, #10B981)",
+              boxShadow: "0 0 6px var(--theme-primary, #10B981)",
+            }}
+            animate={{ x: [-8, 8] }}
+            transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
+          />
+        </div>
+
+        {/* Central Regional Exchange Hub */}
+        <div
+          className="flex flex-col items-center justify-center rounded px-1.5 py-0.5 text-center shrink-0"
+          style={activeHighlightStyle}
+        >
+          <Share2 className="h-2.5 w-2.5 mb-0.5 animate-spin" style={{ animationDuration: "10s" }} />
+          <span className="font-bold text-[6.5px] leading-tight">[REGIONAL_EXCHANGE]</span>
+          <span className="text-[5.5px] opacity-80">HUB</span>
+        </div>
+
+        {/* Fanout Connectors to 3 Subscribers */}
+        <div className="relative flex-1 h-9 flex items-center justify-center">
+          <svg className="w-full h-full" viewBox="0 0 30 36" fill="none" preserveAspectRatio="none">
+            <path d="M 2 18 C 12 18, 16 6, 28 6" stroke="color-mix(in srgb, var(--theme-text, #f8fafc) 20%, transparent)" strokeWidth="1" />
+            <path d="M 2 18 L 28 18" stroke="color-mix(in srgb, var(--theme-text, #f8fafc) 20%, transparent)" strokeWidth="1" />
+            <path d="M 2 18 C 12 18, 16 30, 28 30" stroke="color-mix(in srgb, var(--theme-text, #f8fafc) 20%, transparent)" strokeWidth="1" />
+
+            <motion.circle
+              r="1.2"
+              fill="var(--theme-primary, #10B981)"
+              animate={{ cx: [2, 28], cy: [18, 6] }}
+              transition={{ duration: 0.9, repeat: Infinity, ease: "easeOut" }}
+            />
+            <motion.circle
+              r="1.2"
+              fill="var(--theme-primary, #10B981)"
+              animate={{ cx: [2, 28], cy: [18, 18] }}
+              transition={{ duration: 0.9, repeat: Infinity, ease: "easeOut", delay: 0.3 }}
+            />
+            <motion.circle
+              r="1.2"
+              fill="var(--theme-primary, #10B981)"
+              animate={{ cx: [2, 28], cy: [18, 30] }}
+              transition={{ duration: 0.9, repeat: Infinity, ease: "easeOut", delay: 0.6 }}
+            />
+          </svg>
+        </div>
+
+        {/* 3 Live Subscribers */}
+        <div className="flex flex-col gap-0.5 min-w-[56px]">
+          <div className="flex items-center justify-between rounded px-1 py-0.2 text-[6.5px]" style={inactiveSlotStyle}>
+            <span style={textSecondaryStyle}>VOTER_1</span>
+            <span className="h-1 w-1 rounded-full" style={{ backgroundColor: "var(--theme-primary, #10B981)" }} />
+          </div>
+          <div className="flex items-center justify-between rounded px-1 py-0.2 text-[6.5px]" style={inactiveSlotStyle}>
+            <span style={textSecondaryStyle}>VOTER_2</span>
+            <span className="h-1 w-1 rounded-full" style={{ backgroundColor: "var(--theme-primary, #10B981)" }} />
+          </div>
+          <div className="flex items-center justify-between rounded px-1 py-0.2 text-[6.5px]" style={inactiveSlotStyle}>
+            <span style={textSecondaryStyle}>AGENT_HQ</span>
+            <span className="h-1 w-1 rounded-full" style={{ backgroundColor: "var(--theme-primary, #10B981)" }} />
+          </div>
+        </div>
+      </div>
+
+      <div className="text-[9px] font-mono flex items-center justify-between" style={textMutedStyle}>
+        <span>Redis Broker Fanout</span>
+        <span>Sub-45ms Broadcast</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── 9. RlsShieldVisual: Granular RBAC & Region-Confined Security ───────────
+
+export function RlsShieldVisual() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none relative h-28 w-full overflow-hidden rounded-xl p-2.5 flex flex-col justify-between"
+      style={outerContainerStyle}
+    >
+      <div className="flex items-center justify-between text-[10px] font-mono">
+        <span style={textSecondaryStyle}>POSTGRES_RLS // RBAC</span>
+        <span
+          className="rounded px-1.5 py-0.5 text-[9px] font-semibold tracking-wider uppercase"
+          style={activeHighlightStyle}
+        >
+          JURISDICTION LOCKED
+        </span>
+      </div>
+
+      {/* 2-Row Database Table Preview */}
+      <div className="my-0.5 flex flex-col gap-1.5">
+        {/* Row 1: Authorized Tenant */}
+        <div
+          className="flex items-center justify-between rounded px-2 py-1 text-[8px] font-mono"
+          style={activeHighlightStyle}
+        >
+          <div className="flex items-center gap-1.5">
+            <CheckCircle2 className="h-3 w-3 shrink-0" />
+            <span className="font-bold">REGION_A [AUTHORIZED]</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-[7px] font-bold px-1 py-0.2 rounded" style={inactiveSlotStyle}>
+              ✓ 200 OK
+            </span>
+          </div>
+        </div>
+
+        {/* Row 2: Blocked by RLS */}
+        <div
+          className="flex items-center justify-between rounded px-2 py-1 text-[8px] font-mono opacity-65"
+          style={{
+            ...inactiveSlotStyle,
+            borderStyle: "dashed",
+          }}
+        >
+          <div className="flex items-center gap-1.5">
+            <Lock className="h-3 w-3 shrink-0" style={{ color: "var(--theme-primary, #10B981)" }} />
+            <span className="line-through font-medium" style={textMutedStyle}>
+              REGION_B [BLOCKED BY RLS]
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span
+              className="text-[7px] font-bold px-1 py-0.2 rounded flex items-center gap-0.5"
+              style={{
+                backgroundColor: "color-mix(in srgb, var(--theme-text, #f8fafc) 12%, transparent)",
+                color: "color-mix(in srgb, var(--theme-text, #f8fafc) 65%, transparent)",
+              }}
+            >
+              <ShieldAlert className="h-2.5 w-2.5" />
+              0 ROWS
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="text-[9px] font-mono flex items-center justify-between" style={textMutedStyle}>
+        <span>Kernel-Level Tenant Policy</span>
+        <span>Zero Cross-Ward Leakage</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── 10. StateLoopVisual: Real-Time Deterministic Game State Synchronization ─
+
+export function StateLoopVisual() {
+  const [turnSeconds, setTurnSeconds] = useState(14.8);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTurnSeconds((prev) => (prev <= 0.2 ? 15.0 : +(prev - 0.1).toFixed(1)));
+    }, 100);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none relative h-28 w-full overflow-hidden rounded-xl p-2.5 flex flex-col justify-between"
+      style={outerContainerStyle}
+    >
+      <div className="flex items-center justify-between text-[10px] font-mono">
+        <span style={textSecondaryStyle}>SOCKET_IO // GAME_LOOP</span>
+        <span
+          className="rounded px-1.5 py-0.5 text-[9px] font-semibold tracking-wider uppercase"
+          style={activeHighlightStyle}
+        >
+          &lt; 50MS DELTA SYNC
+        </span>
+      </div>
+
+      {/* Peer 1 -> Authoritative State Engine <- Peer 2 */}
+      <div className="my-0.5 flex items-center justify-between gap-1 text-[7.5px] font-mono">
+        {/* Peer 1 */}
+        <div
+          className="flex flex-col items-center justify-center rounded px-1.5 py-1 text-center shrink-0 min-w-[50px]"
+          style={inactiveSlotStyle}
+        >
+          <Gamepad2 className="h-3 w-3 mb-0.5" style={{ color: "var(--theme-primary, #10B981)" }} />
+          <span className="font-bold" style={textSecondaryStyle}>PEER_1</span>
+          <span className="text-[6px]" style={{ color: "var(--theme-primary, #10B981)" }}>&lt;18ms</span>
+        </div>
+
+        {/* Pulse Connector Left */}
+        <div className="relative flex-1 flex items-center justify-center">
+          <div
+            className="h-px w-full"
+            style={{
+              background: "linear-gradient(to right, color-mix(in srgb, var(--theme-text, #f8fafc) 20%, transparent), var(--theme-primary, #10B981))",
+            }}
+          />
+          <motion.div
+            className="absolute h-1.5 w-1.5 rounded-full"
+            style={{
+              backgroundColor: "var(--theme-primary, #10B981)",
+              boxShadow: "0 0 6px var(--theme-primary, #10B981)",
+            }}
+            animate={{ x: [-12, 12, -12] }}
+            transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </div>
+
+        {/* Authoritative State Engine */}
+        <div
+          className="flex flex-col items-center justify-center rounded px-2 py-1 text-center shrink-0"
+          style={activeHighlightStyle}
+        >
+          <div className="flex items-center gap-1">
+            <Timer className="h-2.5 w-2.5 animate-pulse" />
+            <span className="font-bold uppercase text-[7.5px]">
+              TURN_LOCK: {turnSeconds.toFixed(1)}s
+            </span>
+          </div>
+          <div className="text-[6px] font-mono mt-0.5 flex items-center gap-1">
+            <span className="h-1 w-1 rounded-full animate-ping" style={{ backgroundColor: "var(--theme-primary, #10B981)" }} />
+            <span>[AUTHORITATIVE_STATE_ENGINE]</span>
+          </div>
+          <span className="text-[5.5px] opacity-80 mt-0.5">STATE_VERIFIED // 0x8F2A</span>
+        </div>
+
+        {/* Pulse Connector Right */}
+        <div className="relative flex-1 flex items-center justify-center">
+          <div
+            className="h-px w-full"
+            style={{
+              background: "linear-gradient(to right, var(--theme-primary, #10B981), color-mix(in srgb, var(--theme-text, #f8fafc) 20%, transparent))",
+            }}
+          />
+          <motion.div
+            className="absolute h-1.5 w-1.5 rounded-full"
+            style={{
+              backgroundColor: "var(--theme-primary, #10B981)",
+              boxShadow: "0 0 6px var(--theme-primary, #10B981)",
+            }}
+            animate={{ x: [12, -12, 12] }}
+            transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </div>
+
+        {/* Peer 2 */}
+        <div
+          className="flex flex-col items-center justify-center rounded px-1.5 py-1 text-center shrink-0 min-w-[50px]"
+          style={inactiveSlotStyle}
+        >
+          <Gamepad2 className="h-3 w-3 mb-0.5" style={{ color: "var(--theme-primary, #10B981)" }} />
+          <span className="font-bold" style={textSecondaryStyle}>PEER_2</span>
+          <span className="text-[6px]" style={{ color: "var(--theme-primary, #10B981)" }}>&lt;24ms</span>
+        </div>
+      </div>
+
+      <div className="text-[9px] font-mono flex items-center justify-between" style={textMutedStyle}>
+        <span>Lockstep Sync</span>
+        <span>Deterministic Hash Verification</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── 11. EscrowLedgerVisual: Manual Wager Selection & KYC Ledger ─────────────
+
+export function EscrowLedgerVisual() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none relative h-28 w-full overflow-hidden rounded-xl p-2.5 flex flex-col justify-between"
+      style={outerContainerStyle}
+    >
+      <div className="flex items-center justify-between text-[10px] font-mono">
+        <span style={textSecondaryStyle}>ATOMIC_WAGER_LEDGER</span>
+        <span
+          className="rounded px-1.5 py-0.5 text-[9px] font-semibold tracking-wider uppercase"
+          style={activeHighlightStyle}
+        >
+          ZERO DOUBLE-SPEND
+        </span>
+      </div>
+
+      {/* 3-Step Pipeline: WAGER -> KYC -> ESCROW */}
+      <div className="my-0.5 space-y-1">
+        <div className="flex items-center justify-between gap-1 text-[7.5px] font-mono">
+          {/* Step 1 */}
+          <div
+            className="flex-1 flex flex-col items-center justify-center rounded px-1 py-0.5 text-center"
+            style={inactiveSlotStyle}
+          >
+            <Coins className="h-2.5 w-2.5 mb-0.5" style={{ color: "var(--theme-primary, #10B981)" }} />
+            <span className="font-bold truncate" style={textSecondaryStyle}>[MANUAL_WAGER_LOCK]</span>
+          </div>
+
+          <span className="text-[8px]" style={{ color: "var(--theme-primary, #10B981)" }}>→</span>
+
+          {/* Step 2 */}
+          <div
+            className="flex-1 flex flex-col items-center justify-center rounded px-1 py-0.5 text-center"
+            style={inactiveSlotStyle}
+          >
+            <ShieldCheck className="h-2.5 w-2.5 mb-0.5" style={{ color: "var(--theme-primary, #10B981)" }} />
+            <span className="font-bold truncate" style={textSecondaryStyle}>[UTR_KYC_VERIFIER]</span>
+          </div>
+
+          <span className="text-[8px]" style={{ color: "var(--theme-primary, #10B981)" }}>→</span>
+
+          {/* Step 3 */}
+          <div
+            className="flex-1 flex flex-col items-center justify-center rounded px-1 py-0.5 text-center"
+            style={activeHighlightStyle}
+          >
+            <Check className="h-2.5 w-2.5 mb-0.5 stroke-[2.5]" />
+            <span className="font-bold truncate">[ESCROW_SETTLED]</span>
+          </div>
+        </div>
+
+        {/* Row Lock Status Indicator */}
+        <div
+          className="flex items-center justify-between rounded px-2 py-0.5 text-[7px] font-mono"
+          style={inactiveSlotStyle}
+        >
+          <div className="flex items-center gap-1">
+            <Lock className="h-2 w-2" style={{ color: "var(--theme-primary, #10B981)" }} />
+            <span className="font-bold" style={{ color: "var(--theme-primary, #10B981)" }}>
+              ROW_LOCK: ACQUIRED
+            </span>
+          </div>
+          <span style={textSecondaryStyle}>ISOLATION: SERIALIZABLE</span>
+        </div>
+      </div>
+
+      <div className="text-[9px] font-mono flex items-center justify-between" style={textMutedStyle}>
+        <span>ACID Transaction Isolation</span>
+        <span>Cryptographic Audit Proof</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── 12. WebGlPipelineVisual: Three.js / React Three Fiber 3D Experience ──────
+
+export function WebGlPipelineVisual() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none relative h-28 w-full overflow-hidden rounded-xl p-2.5 flex flex-col justify-between"
+      style={outerContainerStyle}
+    >
+      <div className="flex items-center justify-between text-[10px] font-mono">
+        <span style={textSecondaryStyle}>R3F_WEBGL_SHADER</span>
+        <span
+          className="rounded px-1.5 py-0.5 text-[9px] font-semibold tracking-wider uppercase"
+          style={activeHighlightStyle}
+        >
+          LOCKED 60 FPS
+        </span>
+      </div>
+
+      {/* 3D Wireframe Cube Node + Parallel Thread Bars */}
+      <div className="my-0.5 flex items-center gap-2.5">
+        {/* Animated Wireframe Cube */}
+        <div className="relative h-11 w-11 flex items-center justify-center shrink-0">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+            className="relative h-8 w-8 rounded border flex items-center justify-center"
+            style={{
+              borderColor: "var(--theme-primary, #10B981)",
+              backgroundColor: "color-mix(in srgb, var(--theme-primary, #10B981) 12%, transparent)",
+              boxShadow: "0 0 10px color-mix(in srgb, var(--theme-primary, #10B981) 30%, transparent)",
+            }}
+          >
+            <Box className="h-4 w-4 animate-pulse" style={{ color: "var(--theme-primary, #10B981)" }} />
+            <span
+              className="absolute -top-1 -right-1 h-1.5 w-1.5 rounded-full"
+              style={{ backgroundColor: "var(--theme-primary, #10B981)" }}
+            />
+            <span
+              className="absolute -bottom-1 -left-1 h-1.5 w-1.5 rounded-full"
+              style={{ backgroundColor: "color-mix(in srgb, var(--theme-text, #f8fafc) 40%, transparent)" }}
+            />
+          </motion.div>
+        </div>
+
+        {/* Parallel Thread Bars */}
+        <div className="flex-1 flex flex-col justify-center gap-1 text-[7.5px] font-mono">
+          {/* Thread 1: GPU Shader */}
+          <div className="space-y-0.5">
+            <div className="flex items-center justify-between">
+              <span className="font-bold flex items-center gap-1" style={textSecondaryStyle}>
+                <span className="h-1 w-1 rounded-full" style={{ backgroundColor: "var(--theme-primary, #10B981)" }} />
+                GPU_SHADER_THREAD
+              </span>
+              <span className="font-bold" style={{ color: "var(--theme-primary, #10B981)" }}>
+                [60 FPS]
+              </span>
+            </div>
+            <div className="h-1 w-full rounded-full overflow-hidden" style={inactiveSlotStyle}>
+              <motion.div
+                className="h-full rounded-full"
+                style={{ backgroundColor: "var(--theme-primary, #10B981)" }}
+                animate={{ width: ["96%", "100%", "98%"] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+              />
+            </div>
+          </div>
+
+          {/* Thread 2: Main UI */}
+          <div className="space-y-0.5">
+            <div className="flex items-center justify-between">
+              <span className="font-bold flex items-center gap-1" style={textSecondaryStyle}>
+                <span className="h-1 w-1 rounded-full" style={{ backgroundColor: "color-mix(in srgb, var(--theme-text, #f8fafc) 40%, transparent)" }} />
+                MAIN_UI_THREAD
+              </span>
+              <span className="font-medium text-[6.5px]" style={textMutedStyle}>
+                [UNBLOCKED &lt; 1.2s]
+              </span>
+            </div>
+            <div className="h-1 w-full rounded-full overflow-hidden" style={inactiveSlotStyle}>
+              <motion.div
+                className="h-full rounded-full"
+                style={{ backgroundColor: "color-mix(in srgb, var(--theme-primary, #10B981) 60%, var(--theme-text, #f8fafc))" }}
+                animate={{ width: ["16%", "22%", "14%"] }}
+                transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="text-[9px] font-mono flex items-center justify-between" style={textMutedStyle}>
+        <span>Off-Thread WebGL Shaders</span>
+        <span>Zero Frame Drops (60fps)</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── 13. DefaultVisual: Generic System Fallback ─────────────────────────────
 
 export function DefaultVisual() {
   return (
@@ -611,6 +1209,33 @@ export default function VisualRegistry({ visualKey }: { visualKey: string }) {
     case "schemacompiler":
     case "schema":
       return <SchemaCompilerVisual />;
+    case "service-mesh":
+    case "servicemesh":
+    case "mesh":
+      return <ServiceMeshVisual />;
+    case "pubsub-stream":
+    case "pubsubstream":
+    case "pubsub":
+    case "stream":
+      return <PubSubStreamVisual />;
+    case "rls-shield":
+    case "rlsshield":
+    case "rls":
+      return <RlsShieldVisual />;
+    case "state-loop":
+    case "stateloop":
+    case "gameloop":
+      return <StateLoopVisual />;
+    case "escrow-ledger":
+    case "escrowledger":
+    case "escrow":
+    case "ledger":
+      return <EscrowLedgerVisual />;
+    case "webgl-pipeline":
+    case "webglpipeline":
+    case "webgl":
+    case "r3f":
+      return <WebGlPipelineVisual />;
     default:
       return <DefaultVisual />;
   }

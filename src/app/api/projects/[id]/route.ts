@@ -10,9 +10,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-/**
- * Extracts the Cloudinary public_id from a secure_url.
- */
 function extractPublicId(url: string): string | null {
   if (!url || !url.includes('res.cloudinary.com')) return null;
   try {
@@ -25,35 +22,32 @@ function extractPublicId(url: string): string | null {
   }
 }
 
-// GET all projects
-export async function GET() {
+// ─── GET /api/projects/:id ──────────────────────────────────────────────────
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   await dbConnect();
+  const { id } = await params;
   try {
-    const projects = await Project.find({});
-    return NextResponse.json(projects, { status: 200 });
+    const project = await Project.findById(id).lean();
+    if (!project) {
+      return NextResponse.json({ message: 'Project not found' }, { status: 404 });
+    }
+    return NextResponse.json(project, { status: 200 });
   } catch (error) {
+    console.error('Error in GET /api/projects/:id:', error);
     return NextResponse.json({ message: 'Server Error' }, { status: 500 });
   }
 }
 
-// POST a new project
-export async function POST(req: NextRequest) {
+// ─── PUT /api/projects/:id ──────────────────────────────────────────────────
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   await dbConnect();
-  try {
-    const body = await req.json();
-    const newProject = await Project.create(body);
-    await logAuditAction({ action: 'CREATE', entityType: 'Project', entityId: String(newProject._id), changes: body });
-    return NextResponse.json(newProject, { status: 201 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: 'Server Error' }, { status: 500 });
-  }
-}
-
-// PUT (update) a project
-export async function PUT(req: NextRequest) {
-  await dbConnect();
-  const id = req.url.split('/').pop();
+  const { id } = await params;
 
   if (!id) {
     return NextResponse.json({ message: 'ID not found' }, { status: 400 });
@@ -68,18 +62,26 @@ export async function PUT(req: NextRequest) {
     if (!updatedProject) {
       return NextResponse.json({ message: 'Project not found' }, { status: 404 });
     }
-    await logAuditAction({ action: 'UPDATE', entityType: 'Project', entityId: String(updatedProject._id), changes: body });
+    await logAuditAction({
+      action: 'UPDATE',
+      entityType: 'Project',
+      entityId: String(updatedProject._id),
+      changes: body,
+    });
     return NextResponse.json(updatedProject, { status: 200 });
   } catch (error) {
-    console.error(error);
+    console.error('Error in PUT /api/projects/:id:', error);
     return NextResponse.json({ message: 'Server Error' }, { status: 500 });
   }
 }
 
-// DELETE a project — also cleans up Cloudinary images
-export async function DELETE(req: NextRequest) {
+// ─── DELETE /api/projects/:id ─────────────────────────────────────────────
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   await dbConnect();
-  const id = req.url.split('/').pop();
+  const { id } = await params;
 
   if (!id) {
     return NextResponse.json({ message: 'ID not found' }, { status: 400 });
@@ -91,25 +93,18 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ message: 'Project not found' }, { status: 404 });
     }
 
-    // Clean up Cloudinary images before deleting the document
-    const imageUrls = [project.imageUrl, project.diagramUrl].filter(Boolean) as string[];
-    const deletePromises = imageUrls.map((url) => {
-      const publicId = extractPublicId(url);
+    if (project.image) {
+      const publicId = extractPublicId(project.image);
       if (publicId) {
-        return cloudinary.uploader.destroy(publicId, { resource_type: 'image' }).catch((err: unknown) => {
-          console.error(`Failed to delete Cloudinary image ${publicId}:`, err);
-        });
+        await cloudinary.uploader.destroy(publicId);
       }
-      return Promise.resolve();
-    });
-
-    await Promise.all(deletePromises);
+    }
 
     await Project.findByIdAndDelete(id);
     await logAuditAction({ action: 'DELETE', entityType: 'Project', entityId: id });
     return NextResponse.json({ message: 'Project deleted' }, { status: 200 });
   } catch (error) {
-    console.error(error);
+    console.error('Error in DELETE /api/projects/:id:', error);
     return NextResponse.json({ message: 'Server Error' }, { status: 500 });
   }
 }
