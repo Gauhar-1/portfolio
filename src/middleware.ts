@@ -21,13 +21,6 @@ export async function middleware(req: NextRequest) {
 
   const { isLoggedIn } = session;
 
-  // 1. Gateway Bypass
-  if (req.nextUrl.pathname === '/') {
-    const sessionId = req.cookies.get('sessionId')?.value;
-    if (sessionId) {
-      return NextResponse.redirect(new URL('/overview', req.url));
-    }
-  }
 
   if (req.nextUrl.pathname.startsWith('/admin')) {
     if (!isLoggedIn) {

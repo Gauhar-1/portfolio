@@ -63,7 +63,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         
         {/* Navigation */}
         <Link 
-          href="/overview" 
+          href="/" 
           className="inline-flex items-center font-mono text-xs md:text-sm font-bold text-slate-500 uppercase tracking-widest hover:text-emerald-500 transition-colors group mb-[-2rem]"
         >
           <ArrowLeft className="w-4 h-4 mr-3 group-hover:-translate-x-2 transition-transform" />
