@@ -55,6 +55,11 @@ export async function PUT(
 
   try {
     const body = await req.json();
+    if (body.title && !body.slug) {
+      body.slug = body.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+    } else if (body.slug) {
+      body.slug = body.slug.toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
     const updatedProject = await Project.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,

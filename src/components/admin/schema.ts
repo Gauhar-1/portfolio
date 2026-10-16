@@ -1,7 +1,10 @@
 import * as z from 'zod';
 
-// --- Sub-schemas ---
+// --- Category Enum ---
+export const projectCategoryEnum = z.enum(['AI_RAG', 'SYSTEMS_ENGINES', 'FULLSTACK_SAAS']);
+export type ProjectCategory = z.infer<typeof projectCategoryEnum>;
 
+// --- Legacy Sub-schemas (kept for backward compatibility) ---
 export const impactMetricSchema = z.object({
   label: z.string().min(1, 'Label is required.'),
   value: z.string().min(1, 'Value is required.'),
@@ -20,25 +23,28 @@ export const architecturalChallengeSchema = z.object({
   tradeoff: z.string().min(5, 'Trade-off must be at least 5 characters.'),
 });
 
-// --- Main project schema ---
+// --- Lean Project Schema ---
 
 export const projectSchema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters.'),
-  tagline: z.string().min(10, 'Tagline must be at least 10 characters.'),
-  overview: z.string().min(20, 'Overview must be at least 20 characters.'),
-  technologies: z.string().min(2, 'Please add at least one technology.'),
+  slug: z
+    .string()
+    .min(1, 'Slug is required.')
+    .regex(/^[a-z0-9]+$/, 'Slug must only contain lowercase alphanumeric characters with no spaces.'),
+  category: projectCategoryEnum.default('AI_RAG'),
+  featuredOrder: z.coerce.number().default(99),
+  tagline: z.string().min(5, 'Tagline is required (5-8 word hook).'),
+  overview: z.string().min(10, 'Overview is required (2-sentence business problem + architecture hook).'),
+  technologies: z.string().min(1, 'Please add at least one technology.'),
   imageUrl: z.string().url('A valid cover image URL is required.'),
-  diagramUrl: z.string().url().optional().or(z.literal('')),
   videoUrl: z.string().url().optional().or(z.literal('')),
-  links: z.object({
-    website: z.string().url().optional().or(z.literal('')),
-    github: z.string().url().optional().or(z.literal('')),
-    demo: z.string().url().optional().or(z.literal('')),
-  }).optional(),
-  impactMetrics: z.array(impactMetricSchema).default([]),
-  systemFeatures: z.array(systemFeatureSchema).default([]),
-  architecturalChallenges: z.array(architecturalChallengeSchema).default([]),
-  dxSnippet: z.string().optional(),
+  links: z
+    .object({
+      website: z.string().url().optional().or(z.literal('')),
+      github: z.string().url().optional().or(z.literal('')),
+      demo: z.string().url().optional().or(z.literal('')),
+    })
+    .optional(),
 });
 
 export type ProjectFormValues = z.infer<typeof projectSchema>;

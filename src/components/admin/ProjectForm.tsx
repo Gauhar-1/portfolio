@@ -11,27 +11,34 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import {
   Loader2,
-  PlusCircle,
-  Trash2,
   ChevronRight,
   Upload,
   ImageIcon,
-  BarChart3,
   Cpu,
-  AlertTriangle,
-  X,
+  Layers,
+  CheckCircle2,
+  AlertCircle,
+  ExternalLink,
   Replace,
+  Sparkles,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { projectSchema, ProjectFormValues, extractCloudinaryPublicId } from './schema';
 
@@ -53,7 +60,6 @@ async function uploadImageWithSwap(
   file: File,
   currentUrl: string | undefined
 ): Promise<{ url: string; publicId: string }> {
-  // 1. If there's an existing Cloudinary image, delete it first
   if (currentUrl) {
     const oldPublicId = extractCloudinaryPublicId(currentUrl);
     if (oldPublicId) {
@@ -61,11 +67,10 @@ async function uploadImageWithSwap(
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ publicId: oldPublicId }),
-      });
+      }).catch(console.error);
     }
   }
 
-  // 2. Upload the new file
   const formData = new FormData();
   formData.append('file', file);
 
@@ -93,58 +98,78 @@ export default function ProjectForm({
   title,
 }: ProjectFormProps) {
   const { toast } = useToast();
-
-  // File input refs for the two image fields
   const coverInputRef = useRef<HTMLInputElement>(null);
-  const diagramInputRef = useRef<HTMLInputElement>(null);
 
-  // Upload loading states
   const [isCoverUploading, setIsCoverUploading] = useState(false);
-  const [isDiagramUploading, setIsDiagramUploading] = useState(false);
+  const [architectures, setArchitectures] = useState<Array<{ slug: string; name: string }>>([]);
+  const [loadingArchs, setLoadingArchs] = useState(true);
+
+  // Fetch architectures to check if slug matches an existing blueprint
+  useEffect(() => {
+    let isMounted = true;
+    async function loadArchitectures() {
+      try {
+        const res = await fetch('/api/admin/architectures');
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted) setArchitectures(data || []);
+        }
+      } catch (err) {
+        console.error('Failed to load architectures for slug matching', err);
+      } finally {
+        if (isMounted) setLoadingArchs(false);
+      }
+    }
+    loadArchitectures();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(projectSchema),
-    defaultValues: defaultValues || {
-      title: '',
-      tagline: '',
-      overview: '',
-      technologies: '',
-      imageUrl: '',
-      diagramUrl: '',
-      videoUrl: '',
-      links: { website: '', github: '', demo: '' },
-      impactMetrics: [],
-      systemFeatures: [],
-      architecturalChallenges: [],
-      dxSnippet: '',
+    defaultValues: {
+      title: defaultValues?.title || '',
+      slug:
+        defaultValues?.slug ||
+        (defaultValues?.title || '').toLowerCase().replace(/[^a-z0-9]/g, ''),
+      category: defaultValues?.category || 'AI_RAG',
+      featuredOrder:
+        typeof defaultValues?.featuredOrder === 'number' ? defaultValues.featuredOrder : 99,
+      tagline: defaultValues?.tagline || '',
+      overview: defaultValues?.overview || '',
+      technologies: defaultValues?.technologies || '',
+      imageUrl: defaultValues?.imageUrl || '',
+      videoUrl: defaultValues?.videoUrl || '',
+      links: {
+        website: defaultValues?.links?.website || '',
+        github: defaultValues?.links?.github || '',
+        demo: defaultValues?.links?.demo || '',
+      },
     },
   });
 
-  // --- Field Arrays ---
-  const metricsArray = useFieldArray({ control: form.control, name: 'impactMetrics' });
-  const featuresArray = useFieldArray({ control: form.control, name: 'systemFeatures' });
-  const challengesArray = useFieldArray({ control: form.control, name: 'architecturalChallenges' });
+  const watchedSlug = form.watch('slug') || '';
+  const normalizedWatchedSlug = watchedSlug.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const matchedArch = architectures.find(
+    (a) => (a.slug || '').toLowerCase().replace(/[^a-z0-9]/g, '') === normalizedWatchedSlug
+  );
 
-  // --- Image upload handler (generic for both cover & diagram) ---
-  const handleImageUpload = useCallback(
-    async (
-      event: React.ChangeEvent<HTMLInputElement>,
-      fieldName: 'imageUrl' | 'diagramUrl',
-      setLoading: (v: boolean) => void,
-      inputRef: React.RefObject<HTMLInputElement | null>
-    ) => {
+  // Handle Cover Image upload
+  const handleCoverUpload = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
       if (!file) return;
 
-      setLoading(true);
+      setIsCoverUploading(true);
       try {
-        const currentUrl = form.getValues(fieldName);
+        const currentUrl = form.getValues('imageUrl');
         const { url } = await uploadImageWithSwap(file, currentUrl || undefined);
-        form.setValue(fieldName, url, { shouldValidate: true });
+        form.setValue('imageUrl', url, { shouldValidate: true });
 
         toast({
-          title: 'Image Uploaded!',
-          description: `Your ${fieldName === 'imageUrl' ? 'cover image' : 'architecture diagram'} has been uploaded.`,
+          title: 'Cover Image Uploaded!',
+          description: 'Your project cover screenshot is saved.',
         });
       } catch (error: any) {
         console.error(error);
@@ -154,16 +179,14 @@ export default function ProjectForm({
           description: error.message || 'Could not upload image.',
         });
       } finally {
-        setLoading(false);
-        if (inputRef.current) {
-          inputRef.current.value = '';
+        setIsCoverUploading(false);
+        if (coverInputRef.current) {
+          coverInputRef.current.value = '';
         }
       }
     },
     [form, toast]
   );
-
-  const anyUploading = isCoverUploading || isDiagramUploading;
 
   return (
     <div className="min-h-screen bg-secondary pb-24 overflow-y-auto">
@@ -171,9 +194,13 @@ export default function ProjectForm({
       <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border w-full shadow-sm">
         <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center text-sm text-muted-foreground font-medium">
-            <Link href="/admin" className="hover:text-primary transition-colors">Admin</Link>
+            <Link href="/admin" className="hover:text-primary transition-colors">
+              Admin
+            </Link>
             <ChevronRight className="w-4 h-4 mx-1" />
-            <Link href="/admin/projects" className="hover:text-primary transition-colors">Projects</Link>
+            <Link href="/admin/projects" className="hover:text-primary transition-colors">
+              Projects
+            </Link>
             <ChevronRight className="w-4 h-4 mx-1" />
             <span className="text-foreground">{title}</span>
           </div>
@@ -185,10 +212,13 @@ export default function ProjectForm({
               type="button"
               size="sm"
               onClick={form.handleSubmit(onSubmit)}
-              disabled={isSubmitting || anyUploading}
+              disabled={isSubmitting || isCoverUploading}
             >
               {isSubmitting ? (
-                <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</>
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
               ) : (
                 'Save Changes'
               )}
@@ -200,163 +230,301 @@ export default function ProjectForm({
       <div className="max-w-4xl mx-auto px-4 mt-8">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-
             {/* ═══════════════════════════════════════════════════════════ */}
-            {/* Card 1: Basic Details                                     */}
+            {/* Card 1: Core Identity & Cross-Collection Architecture Link */}
             {/* ═══════════════════════════════════════════════════════════ */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Cpu className="h-5 w-5 text-primary" />
-                  Basic Details
+                  Project Identity & Architecture Link
                 </CardTitle>
-                <CardDescription>Core information about the project.</CardDescription>
+                <CardDescription>
+                  Define the project title, hiring intent category, sorting order, and architecture
+                  collection link via slug.
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <FormField control={form.control} name="title" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Project Title</FormLabel>
-                    <FormControl><Input placeholder="e.g. Real-Time Analytics Pipeline" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
+              <CardContent className="space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Title */}
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Project Title *</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g. QuickBiteQR, Founder Diary"
+                            {...field}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              const auto = e.target.value
+                                .toLowerCase()
+                                .replace(/[^a-z0-9]/g, '');
+                              form.setValue('slug', auto, { shouldValidate: true });
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField control={form.control} name="tagline" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tagline</FormLabel>
-                    <FormControl><Input placeholder="A concise one-liner that sells the project" {...field} /></FormControl>
-                    <FormDescription>Min 10 characters. Think elevator pitch.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-
-                <FormField control={form.control} name="overview" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Overview</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        rows={5}
-                        placeholder="A comprehensive overview of the project — what it does, why it exists, and the engineering philosophy behind it..."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>Min 20 characters. This replaces the old description field.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-
-                <FormField control={form.control} name="technologies" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Technologies (comma-separated)</FormLabel>
-                    <FormControl><Input placeholder="e.g. React, Node.js, Kafka, PostgreSQL" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-
-                <Separator />
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <FormField control={form.control} name="links.website" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Website URL</FormLabel>
-                      <FormControl><Input placeholder="https://..." {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                  <FormField control={form.control} name="links.github" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>GitHub URL</FormLabel>
-                      <FormControl><Input placeholder="https://..." {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                  <FormField control={form.control} name="links.demo" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Demo URL</FormLabel>
-                      <FormControl><Input placeholder="https://..." {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
+                  {/* Slug */}
+                  <FormField
+                    control={form.control}
+                    name="slug"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center justify-between">
+                          <span>Lookup Slug *</span>
+                          <span className="text-[10px] text-muted-foreground uppercase font-mono">
+                            Auto-Formatted
+                          </span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g. quickbiteqr"
+                            {...field}
+                            onChange={(e) => {
+                              const clean = e.target.value
+                                .toLowerCase()
+                                .replace(/[^a-z0-9]/g, '');
+                              field.onChange(clean);
+                            }}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Lowercase, alphanumeric only. Matches{' '}
+                          <code className="text-xs bg-muted px-1 py-0.5 rounded font-mono">
+                            /architecture/[slug]
+                          </code>
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
 
-                <FormField control={form.control} name="videoUrl" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Video URL (Optional)</FormLabel>
-                    <FormControl><Input placeholder="Loom or YouTube link" {...field} /></FormControl>
-                    <FormDescription>A walkthrough or demo video.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )} />
+                {/* Architecture Blueprint Match Indicator */}
+                <div className="p-3.5 rounded-lg border text-xs font-mono transition-all">
+                  {loadingArchs ? (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      Checking matching Architecture blueprint...
+                    </div>
+                  ) : matchedArch ? (
+                    <div className="flex items-center justify-between gap-3 text-emerald-400 bg-emerald-500/10 border-emerald-500/30 p-2.5 rounded-md">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                        <span>
+                          <strong>Connected Blueprint:</strong> &ldquo;{matchedArch.name}&rdquo; (
+                          <code>/architecture/{matchedArch.slug}</code>)
+                        </span>
+                      </div>
+                      <Link
+                        href={`/architecture/${matchedArch.slug}`}
+                        target="_blank"
+                        className="inline-flex items-center gap-1 text-[11px] underline hover:text-emerald-300 shrink-0"
+                      >
+                        Preview <ExternalLink className="w-3 h-3" />
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 text-amber-400 bg-amber-500/10 border-amber-500/30 p-2.5 rounded-md">
+                      <AlertCircle className="w-4 h-4 shrink-0 text-amber-400" />
+                      <span>
+                        <strong>Standalone Project:</strong> No Architecture blueprint found for{' '}
+                        <code>{normalizedWatchedSlug || 'this-slug'}</code>. Recruiter stage will
+                        render standalone fallback.
+                      </span>
+                    </div>
+                  )}
+                </div>
 
-                <FormField control={form.control} name="dxSnippet" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>DX Snippet (Optional)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        rows={3}
-                        placeholder={"$ git clone https://github.com/...\n$ npm install\n$ npm run dev"}
-                        className="font-mono text-sm"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>Quick-start bash commands for developer experience.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Category */}
+                  <FormField
+                    control={form.control}
+                    name="category"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Recruiter JD Category *</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select intent category" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="AI_RAG">🧠 AI & RAG Engines</SelectItem>
+                            <SelectItem value="SYSTEMS_ENGINES">
+                              ⚡ Distributed & Media Engines
+                            </SelectItem>
+                            <SelectItem value="FULLSTACK_SAAS">🧩 Full-Stack & SaaS</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormDescription>
+                          Pigeonholes project under recruiter filter tabs.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Featured Order */}
+                  <FormField
+                    control={form.control}
+                    name="featuredOrder"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Featured Display Order</FormLabel>
+                        <FormControl>
+                          <Input type="number" min={1} max={999} {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          Lower numbers appear first (e.g. 1, 2, 3... default 99).
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Tagline */}
+                <FormField
+                  control={form.control}
+                  name="tagline"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tagline (5-8 Word Hook) *</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g. Serverless POS handling Friday dinner rushes at 98% compute margins"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Crisp punchline visible in the left selector list.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Overview */}
+                <FormField
+                  control={form.control}
+                  name="overview"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Overview (2-Sentence Business Problem + Ownership) *</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          rows={3}
+                          placeholder="Restaurant traffic is aggressively clustered on Friday nights, causing relational databases to exhaust connection limits. I architected an edge-cached, serverless POS reducing read load by 92%."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Concise narrative shown on the tactical visual stage.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Technologies */}
+                <FormField
+                  control={form.control}
+                  name="technologies"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Technologies (Comma-separated) *</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g. Next.js 15, TypeScript, Upstash Redis, PostgreSQL, TailwindCSS"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </CardContent>
             </Card>
 
             {/* ═══════════════════════════════════════════════════════════ */}
-            {/* Card 2: Media Management                                  */}
+            {/* Card 2: Visual Stage Media & Links                          */}
             {/* ═══════════════════════════════════════════════════════════ */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ImageIcon className="h-5 w-5 text-primary" />
-                  Media Management
+                  Visual Showcase & External Links
                 </CardTitle>
-                <CardDescription>Cover image and architecture diagram. Replacing an existing image automatically deletes the old one from Cloudinary.</CardDescription>
+                <CardDescription>
+                  Upload cover screenshot, optional preview video loop, and repo/live links.
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-
                 {/* Cover Image */}
                 <div className="space-y-3">
-                  <FormField control={form.control} name="imageUrl" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Cover Image *</FormLabel>
-                      <div className="flex gap-2 items-start">
-                        <FormControl>
-                          <Input placeholder="https://res.cloudinary.com/..." {...field} className="flex-1" readOnly />
-                        </FormControl>
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept="image/*"
-                          ref={coverInputRef}
-                          onChange={(e) => handleImageUpload(e, 'imageUrl', setIsCoverUploading, coverInputRef)}
-                        />
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={() => coverInputRef.current?.click()}
-                          disabled={isCoverUploading}
-                        >
-                          {isCoverUploading ? (
-                            <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Uploading...</>
-                          ) : field.value ? (
-                            <><Replace className="mr-2 h-4 w-4" />Replace</>
-                          ) : (
-                            <><Upload className="mr-2 h-4 w-4" />Upload</>
-                          )}
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
+                  <FormField
+                    control={form.control}
+                    name="imageUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Project Cover Screenshot *</FormLabel>
+                        <div className="flex gap-2 items-start">
+                          <FormControl>
+                            <Input
+                              placeholder="https://res.cloudinary.com/..."
+                              {...field}
+                              className="flex-1"
+                              readOnly
+                            />
+                          </FormControl>
+                          <input
+                            type="file"
+                            className="hidden"
+                            accept="image/*"
+                            ref={coverInputRef}
+                            onChange={handleCoverUpload}
+                          />
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={() => coverInputRef.current?.click()}
+                            disabled={isCoverUploading}
+                          >
+                            {isCoverUploading ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Uploading...
+                              </>
+                            ) : field.value ? (
+                              <>
+                                <Replace className="mr-2 h-4 w-4" />
+                                Replace
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="mr-2 h-4 w-4" />
+                                Upload
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
                   {/* Thumbnail preview */}
                   {form.watch('imageUrl') && (
-                    <div className="relative w-full max-w-xs h-40 rounded-lg overflow-hidden border border-border bg-muted">
+                    <div className="relative w-full max-w-sm h-48 rounded-lg overflow-hidden border border-border bg-muted">
                       <Image
                         src={form.watch('imageUrl')}
                         alt="Cover preview"
@@ -367,265 +535,77 @@ export default function ProjectForm({
                   )}
                 </div>
 
-                <Separator />
-
-                {/* Architecture Diagram */}
-                <div className="space-y-3">
-                  <FormField control={form.control} name="diagramUrl" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Architecture Diagram</FormLabel>
-                      <div className="flex gap-2 items-start">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Video URL */}
+                  <FormField
+                    control={form.control}
+                    name="videoUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Video Preview URL (Optional MP4 / WebM Loop)</FormLabel>
                         <FormControl>
-                          <Input placeholder="https://res.cloudinary.com/..." {...field} className="flex-1" readOnly />
+                          <Input
+                            placeholder="https://example.com/demo.mp4 or YouTube embed"
+                            {...field}
+                          />
                         </FormControl>
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept="image/*"
-                          ref={diagramInputRef}
-                          onChange={(e) => handleImageUpload(e, 'diagramUrl', setIsDiagramUploading, diagramInputRef)}
-                        />
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={() => diagramInputRef.current?.click()}
-                          disabled={isDiagramUploading}
-                        >
-                          {isDiagramUploading ? (
-                            <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Uploading...</>
-                          ) : field.value ? (
-                            <><Replace className="mr-2 h-4 w-4" />Replace</>
-                          ) : (
-                            <><Upload className="mr-2 h-4 w-4" />Upload</>
-                          )}
-                        </Button>
-                      </div>
-                      <FormDescription>Upload your system architecture diagram.</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
+                        <FormDescription>
+                          Plays muted loop in holographic stage if supplied.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                  {/* Thumbnail preview */}
-                  {form.watch('diagramUrl') && (
-                    <div className="relative w-full max-w-xs h-40 rounded-lg overflow-hidden border border-border bg-muted">
-                      <Image
-                        src={form.watch('diagramUrl')!}
-                        alt="Diagram preview"
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  )}
+                  {/* Website / Live Demo */}
+                  <FormField
+                    control={form.control}
+                    name="links.website"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Live Demo / Website URL</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* GitHub URL */}
+                  <FormField
+                    control={form.control}
+                    name="links.github"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>GitHub Repository URL</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://github.com/..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Secondary Demo */}
+                  <FormField
+                    control={form.control}
+                    name="links.demo"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Secondary Demo URL</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </CardContent>
             </Card>
-
-            {/* ═══════════════════════════════════════════════════════════ */}
-            {/* Card 3: Impact Metrics                                    */}
-            {/* ═══════════════════════════════════════════════════════════ */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-primary" />
-                    Impact Metrics
-                  </CardTitle>
-                  <CardDescription className="mt-1">Quantifiable results and KPIs. e.g. &ldquo;99.9% uptime&rdquo;, &ldquo;2x throughput&rdquo;.</CardDescription>
-                </div>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => metricsArray.append({ label: '', value: '', context: '' })}
-                >
-                  <PlusCircle className="mr-2 h-4 w-4" /> Add Metric
-                </Button>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {metricsArray.fields.length === 0 && (
-                  <div className="text-center p-8 border border-dashed rounded-lg text-muted-foreground">
-                    No metrics added yet. Click &ldquo;Add Metric&rdquo; to quantify your impact.
-                  </div>
-                )}
-                {metricsArray.fields.map((field, index) => (
-                  <div key={field.id} className="relative border border-border rounded-xl p-4 sm:p-5 bg-background">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-2 right-2 text-destructive hover:bg-destructive/10"
-                      onClick={() => metricsArray.remove(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pr-8">
-                      <FormField control={form.control} name={`impactMetrics.${index}.label`} render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Label</FormLabel>
-                          <FormControl><Input placeholder="e.g. Uptime" {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField control={form.control} name={`impactMetrics.${index}.value`} render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Value</FormLabel>
-                          <FormControl><Input placeholder="e.g. 99.9%" {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField control={form.control} name={`impactMetrics.${index}.context`} render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Context</FormLabel>
-                          <FormControl><Input placeholder="e.g. Over 12 months in production" {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* ═══════════════════════════════════════════════════════════ */}
-            {/* Card 4: System Features                                   */}
-            {/* ═══════════════════════════════════════════════════════════ */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Cpu className="h-5 w-5 text-primary" />
-                    System Features
-                  </CardTitle>
-                  <CardDescription className="mt-1">Key capabilities and features of the system.</CardDescription>
-                </div>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => featuresArray.append({ featureTitle: '', description: '' })}
-                >
-                  <PlusCircle className="mr-2 h-4 w-4" /> Add Feature
-                </Button>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {featuresArray.fields.length === 0 && (
-                  <div className="text-center p-8 border border-dashed rounded-lg text-muted-foreground">
-                    No features added yet. Click &ldquo;Add Feature&rdquo; to describe system capabilities.
-                  </div>
-                )}
-                {featuresArray.fields.map((field, index) => (
-                  <div key={field.id} className="relative border border-border rounded-xl p-4 sm:p-5 bg-background">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-2 right-2 text-destructive hover:bg-destructive/10"
-                      onClick={() => featuresArray.remove(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                    <div className="space-y-4 pr-8">
-                      <FormField control={form.control} name={`systemFeatures.${index}.featureTitle`} render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Feature Title</FormLabel>
-                          <FormControl><Input placeholder="e.g. Event-Driven Architecture" {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField control={form.control} name={`systemFeatures.${index}.description`} render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Description</FormLabel>
-                          <FormControl>
-                            <Textarea rows={2} placeholder="Explain the feature and its engineering significance..." {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* ═══════════════════════════════════════════════════════════ */}
-            {/* Card 5: Architectural Trade-offs                          */}
-            {/* ═══════════════════════════════════════════════════════════ */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-primary" />
-                    Architectural Trade-offs
-                  </CardTitle>
-                  <CardDescription className="mt-1">Document the hard engineering decisions — bottleneck → solution → trade-off.</CardDescription>
-                </div>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => challengesArray.append({ theme: '', bottleneck: '', solution: '', tradeoff: '' })}
-                >
-                  <PlusCircle className="mr-2 h-4 w-4" /> Add Challenge
-                </Button>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {challengesArray.fields.length === 0 && (
-                  <div className="text-center p-8 border border-dashed rounded-lg text-muted-foreground">
-                    No challenges added yet. Click &ldquo;Add Challenge&rdquo; to document trade-offs.
-                  </div>
-                )}
-                {challengesArray.fields.map((field, index) => (
-                  <div key={field.id} className="relative border border-border rounded-xl p-4 sm:p-6 bg-background">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-2 right-2 text-destructive hover:bg-destructive/10"
-                      onClick={() => challengesArray.remove(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                    <div className="space-y-4 pr-8">
-                      <FormField control={form.control} name={`architecturalChallenges.${index}.theme`} render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Theme</FormLabel>
-                          <FormControl><Input placeholder="e.g. Scalability, Data Consistency" {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField control={form.control} name={`architecturalChallenges.${index}.bottleneck`} render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Bottleneck</FormLabel>
-                          <FormControl>
-                            <Textarea rows={2} placeholder="What was the performance or design bottleneck?" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField control={form.control} name={`architecturalChallenges.${index}.solution`} render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Solution</FormLabel>
-                          <FormControl>
-                            <Textarea rows={2} placeholder="How did you solve it?" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField control={form.control} name={`architecturalChallenges.${index}.tradeoff`} render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Trade-off</FormLabel>
-                          <FormControl>
-                            <Textarea rows={2} placeholder="What trade-off did the solution introduce?" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
           </form>
         </Form>
       </div>

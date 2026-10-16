@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import ExperienceSection from "@/components/experience-section";
+import ProjectsSection from "@/components/ProjectsSection";
+import ContactSection from "@/components/ContactSection";
 import TacticalHeader from "./components/TacticalHeader";
 import OperatorDossier from "./components/OperatorDossier";
 import OperatorViewport from "./components/OperatorViewport";
@@ -281,6 +283,16 @@ export default function HeroLabPage() {
       {/* ── 3. Seamless Handshake: ExperienceSection Stack ── */}
       <section id="experience-stack" className="relative z-20">
         <ExperienceSection />
+      </section>
+
+      {/* ── 4. Tactical Project Arsenal Section ── */}
+      <section id="projects-stack" className="relative z-20">
+        <ProjectsSection />
+      </section>
+
+      {/* ── 5. Mission Comms & Dispatch Terminal ── */}
+      <section id="contact-stack" className="relative z-20">
+        <ContactSection />
       </section>
 
       {/* ── 4. AEO & Semantic Search Crawler Block (Hidden for AI Agents) ── */}

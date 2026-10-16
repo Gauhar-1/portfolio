@@ -33,21 +33,19 @@ export default function EditProjectPage() {
 
         setDefaultValues({
           title: projData.title || '',
+          slug: projData.slug || (projData.title || '').toLowerCase().replace(/[^a-z0-9]/g, ''),
+          category: projData.category || 'AI_RAG',
+          featuredOrder: typeof projData.featuredOrder === 'number' ? projData.featuredOrder : 99,
           tagline: projData.tagline || '',
           overview: projData.overview || '',
           technologies: Array.isArray(projData.technologies) ? projData.technologies.join(', ') : projData.technologies || '',
           imageUrl: projData.imageUrl || '',
-          diagramUrl: projData.diagramUrl || '',
           videoUrl: projData.videoUrl || '',
           links: {
             website: projData.links?.website || '',
             github: projData.links?.github || '',
             demo: projData.links?.demo || '',
           },
-          impactMetrics: projData.impactMetrics || [],
-          systemFeatures: projData.systemFeatures || [],
-          architecturalChallenges: projData.architecturalChallenges || [],
-          dxSnippet: projData.dxSnippet || '',
         });
       } catch (error) {
         console.error(error);

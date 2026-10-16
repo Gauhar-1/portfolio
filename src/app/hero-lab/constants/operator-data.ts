@@ -155,7 +155,7 @@ export const COMMS_INTEL_LINKS: IntelLink[] = [
   {
     id: "link-mail",
     label: "Email Intel",
-    url: "mailto:mustakkhan1210@gmail.com",
+    url: "mailto:mdgoharkhan44@gmail.com",
     keyBind: "M",
     icon: "mail",
     tooltip: "Direct Operator Uplink [Press M]",
