@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Crosshair, Cpu, RotateCcw, Layers } from "lucide-react";
 import { TacticalLoadout } from "../constants/operator-data";
+import { setSavedViewState, setLandingMap } from "@/utils/viewStatePersistence";
 
 interface LoadoutInspectorProps {
   activeLoadout: TacticalLoadout;
@@ -307,6 +308,17 @@ export default function LoadoutInspector({
           {/* Primary CTA Deep-Dive Button */}
           <Link
             href={activeLoadout.deepDiveUrl}
+            onClick={() => {
+              setLandingMap({
+                section: "hero",
+                sectionIndex: 0,
+                heroSlotIndex: activeSlotIndex,
+              });
+              setSavedViewState({
+                sectionIndex: 0,
+                heroSlotIndex: activeSlotIndex,
+              });
+            }}
             className="group relative flex items-center justify-center gap-2 w-full rounded-xl py-3 px-4 text-xs font-mono font-bold tracking-widest uppercase transition-all duration-300 border shadow-lg overflow-hidden cursor-pointer"
             style={{
               backgroundColor: "var(--theme-primary)",

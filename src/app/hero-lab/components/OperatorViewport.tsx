@@ -63,9 +63,11 @@ export default function OperatorViewport({
 
       {/* Main Tactical Viewport Frame */}
       <motion.div
-        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
         className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden border shadow-2xl transition-all duration-500 backdrop-blur-md"
         style={{
+          rotateX,
+          rotateY,
+          transformStyle: "preserve-3d",
           backgroundColor: "color-mix(in srgb, var(--theme-bg) 92%, var(--theme-text) 4%)",
           borderColor: "color-mix(in srgb, var(--theme-text) 16%, transparent)",
         }}

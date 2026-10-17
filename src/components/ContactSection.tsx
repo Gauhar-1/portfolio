@@ -236,7 +236,7 @@ export default function ContactSection() {
           transition: 'background-color 700ms ease, color 700ms ease',
         } as React.CSSProperties
       }
-      className="relative min-h-[100dvh] lg:h-[100dvh] max-h-[100dvh] w-full overflow-hidden px-4 md:px-8 lg:px-14 py-3 md:py-5 flex flex-col justify-between transition-colors duration-700"
+      className="relative h-[100dvh] min-h-[100dvh] max-h-[100dvh] w-full overflow-hidden px-4 md:px-8 lg:px-14 py-3 md:py-5 flex flex-col justify-between transition-colors duration-700"
     >
       {/* Dynamic Ambient Chameleon Glow */}
       <div

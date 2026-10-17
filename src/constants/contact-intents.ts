@@ -3,8 +3,8 @@ export const CONTACT_INTENTS = {
     intentKey: 'INTERVIEW_REQUEST',
     label: '⚡ Schedule Interview',
     roleClass: 'TECHNICAL SCREEN & SQUAD FIT',
-    primaryHex: '#1037b9ff', // Cyber Emerald
-    backgroundHex: '#98e465ff', // Deep Stealth Obsidian
+    primaryHex: '#f6db28ff', // Cyber Emerald
+    backgroundHex: '#3b8907ff', // Deep Stealth Obsidian
     textHex: '#000000ff', // Crisp White
     visualType: 'interview-pipeline',
     visualTitle: 'INTERVIEW_PROTOCOL // < 4H SLA',
@@ -20,8 +20,8 @@ export const CONTACT_INTENTS = {
     intentKey: 'FOUNDING_ROLE',
     label: '🚀 Founding / Core Role',
     roleClass: '0-TO-1 SYSTEMS OWNERSHIP',
-    primaryHex: '#360bf5ff', // Executive Amber
-    backgroundHex: '#fa932cff', // Warm Carbon
+    primaryHex: '#2207bbff', // Executive Amber
+    backgroundHex: '#c0650ad2', // Warm Carbon
     textHex: '#000000ff', // Warm White
     visualType: 'founding-ownership',
     visualTitle: 'FULL_STACK_OWNERSHIP_MATRIX // 0-TO-1',
@@ -38,7 +38,7 @@ export const CONTACT_INTENTS = {
     label: '🛠️ Freelance / Contract',
     roleClass: 'SYSTEM ARCHITECTURE & BUILD',
     primaryHex: '#32ee67ff', // Sovereign Blue
-    backgroundHex: '#f704f3ff', // Deep Navy Obsidian
+    backgroundHex: '#8e098cff', // Deep Navy Obsidian
     textHex: '#000000ff', // Crisp White
     visualType: 'freelance-delivery',
     visualTitle: 'DELIVERY_BLUEPRINT // MILESTONE_LOCKED',
@@ -54,9 +54,9 @@ export const CONTACT_INTENTS = {
     intentKey: 'PORTFOLIO_REVIEW',
     label: '🏆 Portfolio Review',
     roleClass: 'SYSTEM AUDIT & KUDOS',
-    primaryHex: '#B91C1C', // Editorial Crimson
-    backgroundHex: '#E6E4DD', // Warm Editorial Paper (Light Theme!)
-    textHex: '#111115', // Deep Ink Charcoal
+    primaryHex: '#23c0e3ff', // Editorial Crimson
+    backgroundHex: '#920404d2', // Warm Editorial Paper (Light Theme!)
+    textHex: '#000000ff', // Deep Ink Charcoal
     visualType: 'review-scorecard',
     visualTitle: 'LIVE_PORTFOLIO_TELEMETRY',
     headline: 'Audit the system. Share your engineering feedback.',

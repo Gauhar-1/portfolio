@@ -10,6 +10,7 @@ import {
   animate,
 } from "framer-motion";
 import type { HeroData, HeroMetric } from "@/data/architectures";
+import TacticalReturnNav from "./TacticalReturnNav";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -210,22 +211,26 @@ export default function HeroHUD({
         className="pointer-events-none absolute inset-0 hidden md:block"
         style={{ background: ambientGlow }}
       />
+      {/* ── Top Tactical HUD Header Row ── */}
+      <div className="relative mb-6 sm:mb-8 flex flex-wrap items-center justify-between gap-3 sm:gap-4 z-20">
+        <TacticalReturnNav />
 
-      {/* ── "System Status: Operational" Badge ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-        transition={{ duration: 0.4 }}
-        className="relative mb-4 sm:mb-6 inline-flex items-center gap-2 sm:gap-2.5 rounded-full border border-[var(--theme-primary)]/30 bg-[var(--theme-primary)]/10 px-3 py-1 sm:px-3.5 sm:py-1.5 shadow-[0_0_15px_var(--theme-primary)]/20"
-      >
-        <span className="relative flex h-2 w-2">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--theme-primary)] opacity-75" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--theme-primary)]" />
-        </span>
-        <span className="text-[10px] sm:text-[11px] font-semibold tracking-wider uppercase text-[var(--theme-primary)]">
-          System Status: Operational
-        </span>
-      </motion.div>
+        {/* ── "System Status: Operational" Badge ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+          transition={{ duration: 0.4 }}
+          className="inline-flex items-center gap-2 sm:gap-2.5 rounded-full border border-[var(--theme-primary)]/30 bg-[var(--theme-primary)]/10 px-3 py-1 sm:px-3.5 sm:py-1.5 shadow-[0_0_15px_var(--theme-primary)]/20"
+        >
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--theme-primary)] opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--theme-primary)]" />
+          </span>
+          <span className="text-[10px] sm:text-[11px] font-semibold tracking-wider uppercase text-[var(--theme-primary)]">
+            System Status: Operational
+          </span>
+        </motion.div>
+      </div>
 
       {/* ── Breadcrumb ── */}
       <motion.p
