@@ -4,6 +4,8 @@ import Project from '@/models/Project';
 import Architecture from '@/models/Architecture';
 import { logAuditAction } from '@/lib/audit';
 
+import { architecturesData } from '@/data/architectures';
+
 // ─── GET /api/projects ──────────────────────────────────────────────────────
 export async function GET() {
   await dbConnect();
@@ -27,6 +29,18 @@ export async function GET() {
     architectures.forEach((arch: any) => {
       if (arch.slug) {
         archMap.set(arch.slug.toLowerCase(), arch);
+      }
+    });
+
+    // Fallback to static architecturesData if missing from MongoDB
+    Object.entries(architecturesData).forEach(([slug, data]) => {
+      if (!archMap.has(slug.toLowerCase())) {
+        archMap.set(slug.toLowerCase(), {
+          slug: data.slug,
+          theme: data.theme,
+          hero: data.hero,
+          challenges: data.challenges,
+        });
       }
     });
 
